@@ -1,0 +1,31 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ "production" ]
+  pull_request:
+    branches: [ "production" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.10.6'
+          
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: ./switchskilss
+
+      - name: Run Flutter analyzer
+        run: flutter analyze
+        working-directory: ./switchskilss
+
+      - name: Run Flutter tests
+        run: flutter test
+        working-directory: ./switchskilss
