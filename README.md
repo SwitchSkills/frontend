@@ -1,4 +1,4 @@
-# frontend
+# SwitchSkilss - Frontend
 codebase for the app frontend
 
 ## Getting Started
@@ -59,7 +59,5 @@ You can run the app using an emulator or on your physical device.
 
 ## Authors
 
-* **Dag Malstaf** - *Initial work* - [YourGitHub](https://github.com/DagMalstaf)
-* **Tristan Toye** - *Initial work* - [YourGitHub](https://github.com/Tristan-Toye)
-
-See also the list of [contributors](https://github.com/yourusername/your-project/contributors) who participated in this project.
+* **Dag Malstaf** - [Profile](https://github.com/DagMalstaf)
+* **Tristan Toye** - [Profile](https://github.com/Tristan-Toye)
