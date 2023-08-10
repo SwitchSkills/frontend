@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/responsive.dart';
 import '../../components/background.dart';
+import '../../components/bottom_nav_bar.dart';
 
 class FeedScreen extends StatelessWidget {
   const FeedScreen({Key? key}) : super(key: key);
@@ -28,10 +29,7 @@ class MobileFeedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-      ],
-    );
+    return GoogleBottomBar();
   }
 }
+
