@@ -26,8 +26,11 @@ class LoginAndSignupBtn extends StatelessWidget {
                 ),
               );
             },
+            style: ElevatedButton.styleFrom(
+              primary: kPrimaryLightColor, elevation: 0),
             child: Text(
               "Login".toUpperCase(),
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ),
