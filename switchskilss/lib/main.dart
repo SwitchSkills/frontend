@@ -7,19 +7,18 @@ void main() => runApp(const MyApp());
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Auth',
+      title: 'Flutter App',
       theme: ThemeData(
-          primaryColor: kPrimaryColor,
+          primaryColor: kOrangeColor,
           scaffoldBackgroundColor: Colors.white,
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               elevation: 0,
-              primary: kPrimaryColor,
+              primary: kOrangeColor,
               shape: const StadiumBorder(),
               maximumSize: const Size(double.infinity, 56),
               minimumSize: const Size(double.infinity, 56),
@@ -27,9 +26,9 @@ class MyApp extends StatelessWidget {
           ),
           inputDecorationTheme: const InputDecorationTheme(
             filled: true,
-            fillColor: kPrimaryLightColor,
-            iconColor: kPrimaryColor,
-            prefixIconColor: kPrimaryColor,
+            fillColor: kOrangeColor,
+            iconColor: kOrangeColor,
+            prefixIconColor: kOrangeColor,
             contentPadding: EdgeInsets.symmetric(
                 horizontal: defaultPadding, vertical: defaultPadding),
             border: OutlineInputBorder(

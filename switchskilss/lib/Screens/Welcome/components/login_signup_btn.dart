@@ -27,7 +27,7 @@ class LoginAndSignupBtn extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              primary: kPrimaryLightColor, elevation: 0),
+              primary: kOrangeColor, elevation: 0),
             child: Text(
               "Login".toUpperCase(),
               style: TextStyle(color: Colors.black),
@@ -47,7 +47,7 @@ class LoginAndSignupBtn extends StatelessWidget {
             );
           },
           style: ElevatedButton.styleFrom(
-              primary: kPrimaryLightColor, elevation: 0),
+              primary: kSecondaryOrangeColor, elevation: 0),
           child: Text(
             "Sign Up".toUpperCase(),
             style: TextStyle(color: Colors.black),
