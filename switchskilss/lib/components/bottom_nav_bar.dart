@@ -27,7 +27,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('SwitchSkills')),
+      appBar: AppBar(
+        title: const Text('SwitchSkills'),
+        backgroundColor: Colors.orange,
+        automaticallyImplyLeading: false,
+        
+        ),
       body: _pages[_selectedIndex], // Switching between pages
       bottomNavigationBar: SalomonBottomBar(
           currentIndex: _selectedIndex,
