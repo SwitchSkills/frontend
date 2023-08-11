@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import '../../components/background.dart';
 import '../../responsive.dart';
 
-
-class FeedScreen extends StatelessWidget {
-  const FeedScreen({Key? key}) : super(key: key);
+class SearchScreen extends StatelessWidget {
+  const SearchScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,8 +11,8 @@ class FeedScreen extends StatelessWidget {
       child: SingleChildScrollView(
         child: SafeArea(
           child: Responsive(
-            desktop: DesktopFeedScreen(),
-            mobile: const MobileFeedScreen(),
+            desktop: DesktopSearchScreen(),
+            mobile: const MobileSearchScreen(),
           ),
         ),
       ),
@@ -21,7 +20,7 @@ class FeedScreen extends StatelessWidget {
   }
 }
 
-class DesktopFeedScreen extends StatelessWidget {
+class DesktopSearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -32,13 +31,13 @@ class DesktopFeedScreen extends StatelessWidget {
   }
 }
 
-class MobileFeedScreen extends StatelessWidget {
-  const MobileFeedScreen({
+class MobileSearchScreen extends StatelessWidget {
+  const MobileSearchScreen({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+     return Container(); 
   }
 }
