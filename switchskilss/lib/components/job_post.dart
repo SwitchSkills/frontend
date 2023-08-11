@@ -34,39 +34,43 @@ void showProfileDialog(BuildContext context) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('Profile Information'),
-          IconButton(
-            icon: Icon(Icons.close),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-      content: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width - 30, // Adjust as needed
-          ),
-          child: Table(
-            border: TableBorder.all(color: Colors.orange),
-            columnWidths: {
-              0: IntrinsicColumnWidth(),
-              1: IntrinsicColumnWidth(),
-            },
-            children: [
-              _createRow('First Name:', firstName),
-              _createRow('Last Name:', lastName),
-              _createRow('Phone Number:', phoneNumber),
-              _createRow('Email Address:', emailAddress),
-              _createRow('Location:', userLocation),
-              _createRow('Rating:', starRating.toString()),
-            ],
-          ),
+        shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
         ),
-      ),
+        title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+            Text('Profile Information'),
+            IconButton(
+                icon: Icon(Icons.close),
+                color: Colors.orange,
+                onPressed: () => Navigator.of(context).pop(),
+            ),
+            ],
+        ),
+        content: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width - 30, // Adjust as needed
+            ),
+            child: Table(
+                border: TableBorder.all(color: Colors.orange),
+                columnWidths: {
+                0: IntrinsicColumnWidth(),
+                1: IntrinsicColumnWidth(),
+                },
+                children: [
+                _createRow('First Name:', firstName),
+                _createRow('Last Name:', lastName),
+                _createRow('Phone Number:', phoneNumber),
+                _createRow('Email Address:', emailAddress),
+                _createRow('Location:', userLocation),
+                _createRow('Rating:', starRating.toString()),
+                ],
+            ),
+            ),
+        ),
     ),
   );
 }
