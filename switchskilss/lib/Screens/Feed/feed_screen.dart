@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../components/background.dart';
 import '../../responsive.dart';
-
+import '../../components/job_post.dart';
 
 class FeedScreen extends StatelessWidget {
   const FeedScreen({Key? key}) : super(key: key);
@@ -9,12 +9,10 @@ class FeedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Background(
-      child: SingleChildScrollView(
-        child: SafeArea(
-          child: Responsive(
-            desktop: DesktopFeedScreen(),
-            mobile: const MobileFeedScreen(),
-          ),
+      child: SafeArea(
+        child: Responsive(
+          desktop: DesktopFeedScreen(),
+          mobile: const MobileFeedScreen(),
         ),
       ),
     );
@@ -25,9 +23,7 @@ class DesktopFeedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: [
-        
-      ],
+      children: [],
     );
   }
 }
@@ -39,6 +35,22 @@ class MobileFeedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: 10,
+            itemBuilder: (context, index) {
+              return JobPost(
+                profileImageUrl: 'assets/images/profile_pic.jpg',
+                title: 'Job Title $index',
+                description: 'Job description for job $index...',
+                postImageUrl: 'assets/images/post_pic.png',
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 }

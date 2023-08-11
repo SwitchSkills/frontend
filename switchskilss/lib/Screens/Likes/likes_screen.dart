@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../components/background.dart';
 import '../../responsive.dart';
+import '../../components/job_post.dart';
 
 class LikesScreen extends StatelessWidget {
   const LikesScreen({Key? key}) : super(key: key);
@@ -8,12 +9,10 @@ class LikesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Background(
-      child: SingleChildScrollView(
-        child: SafeArea(
-          child: Responsive(
-            desktop: DesktopLikesScreen(),
-            mobile: const MobileLikesScreen(),
-          ),
+      child: SafeArea(
+        child: Responsive(
+          desktop: DesktopLikesScreen(),
+          mobile: const MobileLikesScreen(),
         ),
       ),
     );
@@ -38,6 +37,24 @@ class MobileLikesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     return Container();
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: 3,
+            itemBuilder: (context, index) {
+              return JobPost(
+                profileImageUrl: 'assets/images/profile_pic.jpg',
+                title: 'Liked Job $index',
+                description: 'Job description for liked job $index...',
+                postImageUrl: 'assets/images/post_pic.png',
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 }
+
+
