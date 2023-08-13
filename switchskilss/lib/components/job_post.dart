@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class JobPost extends StatelessWidget {
   final String profileImageUrl;
@@ -115,9 +116,9 @@ TableRow _createRow(String label, String value) {
             Row(
               children: [
                 GestureDetector(
-                    onTap: () => showProfileDialog(context), // Open dialog
+                    onTap: () => showProfileDialog(context),
                     child: CircleAvatar(
-                        backgroundImage: AssetImage(profileImageUrl),
+                      backgroundImage: AssetImage(profileImageUrl),
                     ),
                 ),
                 SizedBox(width: 10),
@@ -131,17 +132,27 @@ TableRow _createRow(String label, String value) {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Container( 
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.blue, 
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Text(
-                    location,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
+                InkWell(
+                  onTap: () async {
+                    final url = 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(location)}';
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Text(
+                      location,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ),

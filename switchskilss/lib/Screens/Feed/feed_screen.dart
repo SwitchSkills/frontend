@@ -52,7 +52,7 @@ class MobileFeedScreen extends StatelessWidget {
               title: 'Job Title $index',
               description: 'Job description for job $index...',
               postImageUrl: 'assets/images/post_pic.png',
-              location: 'Location $index', 
+              location: 'Hasselt', 
               tags: tags, 
               firstName: 'First Name $index',
               lastName: 'Last Name $index',
