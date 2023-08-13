@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share/share.dart';
+import '../Screens/Likes/likes_screen.dart';
+import 'bottom_nav_bar.dart';
 
 class JobPost extends StatelessWidget {
   final String profileImageUrl;
@@ -53,7 +56,7 @@ void showProfileDialog(BuildContext context) {
             scrollDirection: Axis.horizontal,
             child: ConstrainedBox(
             constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width - 30, // Adjust as needed
+                maxWidth: MediaQuery.of(context).size.width - 30, 
             ),
             child: Table(
                 border: TableBorder.all(color: Colors.orange),
@@ -192,20 +195,39 @@ TableRow _createRow(String label, String value) {
               children: [
                 IconButton(
                   icon: Icon(Icons.share),
-                  onPressed: () => print("Shared"),
+                  onPressed: () => Share.share('Check out this job post!'),
                   color: Colors.green,
                 ),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => print("Contact"),
+                    onPressed: () => _showContactOptions(context),
                     child: Text("Contact"),
                   ),
                 ),
                 IconButton(
                   icon: Icon(Icons.favorite_border),
-                  onPressed: () => print("Liked"),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Post has been added to your liked post.'),
+                        action: SnackBarAction(
+                          label: 'Go to Likes',
+                          onPressed: () {
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            }
+                            BottomNavBarState? bottomNavBarState = context.findAncestorStateOfType<BottomNavBarState>(); 
+                            if (bottomNavBarState != null) {
+                              bottomNavBarState.navigateToLikesScreen();
+                            }
+                          },
+                        ),
+                      ),
+                    );
+                  },
                   color: Colors.pink,
                 ),
+
               ],
             ),
           ],
@@ -214,3 +236,44 @@ TableRow _createRow(String label, String value) {
     );
   }
 }
+
+
+_showContactOptions(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Container(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.phone, color: Colors.blue),
+              title: Text('Call'),
+              onTap: () => _launchURL(context, 'tel:+32471785072'),
+            ),
+            ListTile(
+              leading: Icon(Icons.email, color: Colors.green),
+              title: Text('Email'),
+              onTap: () => _launchURL(context, 'mailto:dag.malstaf@gmail.com'),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+_launchURL(BuildContext context, String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Could not launch $url'),
+      ),
+    );
+  }
+}
+
+

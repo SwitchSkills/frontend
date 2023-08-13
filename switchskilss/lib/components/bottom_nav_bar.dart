@@ -10,13 +10,13 @@ class BottomNavBar extends StatefulWidget {
   const BottomNavBar({Key? key}) : super(key: key);
 
   @override
-  State<BottomNavBar> createState() => _BottomNavBarState();
+  State<BottomNavBar> createState() => BottomNavBarState();
 }
 
-class _BottomNavBarState extends State<BottomNavBar> {
+class BottomNavBarState extends State<BottomNavBar> {
   int _selectedIndex = 0;
 
-  // Define the pages to be displayed
+  
   final List<Widget> _pages = [
     FeedScreen(),
     LikesScreen(),
@@ -33,7 +33,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         automaticallyImplyLeading: false,
         
         ),
-      body: _pages[_selectedIndex], // Switching between pages
+      body: _pages[_selectedIndex], 
       bottomNavigationBar: SalomonBottomBar(
           currentIndex: _selectedIndex,
           selectedItemColor: const Color(0xff6200ee),
@@ -45,6 +45,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
           },
           items: _navBarItems),
     );
+  }
+
+  void navigateToLikesScreen() {
+    setState(() {
+      _selectedIndex = 1;
+    });
   }
 }
 

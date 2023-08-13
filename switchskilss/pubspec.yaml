@@ -26,6 +26,8 @@ dependencies:
   flutter_svg: ^1.1.0
   salomon_bottom_bar: ^3.3.2
   url_launcher: ^6.0.12
+  share: ^2.0.4
+
 
 
 
