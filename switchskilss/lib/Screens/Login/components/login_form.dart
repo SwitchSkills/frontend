@@ -45,6 +45,7 @@ class LoginForm extends StatelessWidget {
                 hintStyle: TextStyle(
                 color: Colors.white,
                 ),
+                
                 prefixIcon: Padding(
                   padding: const EdgeInsets.all(defaultPadding),
                   child: Icon(
