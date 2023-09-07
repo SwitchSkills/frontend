@@ -29,6 +29,7 @@ dependencies:
   share: ^2.0.4
   flutter_typeahead: ^4.7.0
   http: ^0.13.3
+  shared_preferences: ^2.2.1
 
 
 

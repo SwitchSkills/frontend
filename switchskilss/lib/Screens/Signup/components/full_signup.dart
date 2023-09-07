@@ -1,43 +1,36 @@
 import 'package:flutter/material.dart';
-import '../../components/background.dart';
-import '../../responsive.dart';
+import '../../../components/background.dart';
+import '../../../responsive.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../../components/bottom_nav_bar.dart';
+import '../../../user_preferences.dart';
 
 
-class EditProfileScreen extends StatelessWidget {
-  final String firstName;
-  final String lastName;
+class FullSingupScreen extends StatelessWidget {
   final String email;
-  final String phoneNumber;
-  final String location;
+  final String password;
 
-  const EditProfileScreen({
+  const FullSingupScreen({
     Key? key,
-    required this.firstName,
-    required this.lastName,
     required this.email,
-    required this.phoneNumber,
-    required this.location,
+    required this.password,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile'),
+        title: Text('Complete Your Profile'),
         backgroundColor: Colors.orange,
       ),
       body: SafeArea(
         child: Responsive(
-          desktop: DesktopEditProfileScreen(),
-          mobile: MobileEditProfileScreen(
-            firstName: firstName,
-            lastName: lastName,
+          desktop: DesktopFullSignupScreen(),
+          mobile: MobileFullSignupScreen(
             email: email,
-            phoneNumber: phoneNumber,
-            location: location,
+            password: password,
           ),
         ),
       ),
@@ -45,7 +38,7 @@ class EditProfileScreen extends StatelessWidget {
   }
 }
 
-class DesktopEditProfileScreen extends StatelessWidget {
+class DesktopFullSignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -54,26 +47,20 @@ class DesktopEditProfileScreen extends StatelessWidget {
   }
 }
 
-class MobileEditProfileScreen extends StatefulWidget {
-  final String firstName;
-  final String lastName;
+class MobileFullSignupScreen extends StatefulWidget {
   final String email;
-  final String phoneNumber;
-  final String location;
+  final String password;
 
-  MobileEditProfileScreen({
-    required this.firstName,
-    required this.lastName,
+  MobileFullSignupScreen({
     required this.email,
-    required this.phoneNumber,
-    required this.location,
+    required this.password,
   });
 
   @override
-  _MobileEditProfileScreenState createState() => _MobileEditProfileScreenState();
+  _MobileFullSignupScreenState createState() => _MobileFullSignupScreenState();
 }
 
-class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
+class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
   late TextEditingController firstNameController;
   late TextEditingController lastNameController;
   late TextEditingController emailController;
@@ -95,13 +82,13 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
 
   _loadSkills();
   _loadRegions();
-
-  firstNameController = TextEditingController(text: widget.firstName);
-  lastNameController = TextEditingController(text: widget.lastName);
+  firstNameController = TextEditingController();
+  lastNameController = TextEditingController();
+ 
+  phoneNumberController = TextEditingController();
+  locationController = TextEditingController();
   emailController = TextEditingController(text: widget.email);
-  phoneNumberController = TextEditingController(text: widget.phoneNumber);
-  passwordController = TextEditingController();
-  locationController = TextEditingController(text: widget.location);
+  passwordController = TextEditingController(text: widget.password);
   }
 
   void _loadSkills() async {
@@ -302,21 +289,58 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
           ElevatedButton(
             onPressed: () async {
               try {
-                int statusCode = await updateUserInfo();
+                Map<String, String> userData = await UserPreferences().getUserData();
+                print(userData);
+                dynamic statusCode = await updateUserInfo();
                 if (statusCode == 200) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('User info updated successfully!')),
-                  );
-                  print(statusCode);
+                    Map<String, String> userInfo = {
+                    'first_name': firstNameController.text,
+                    'last_name': lastNameController.text,
+                    'location': locationController.text,
+                    'email_address': emailController.text,
+                    'phone_number': phoneNumberController.text,
+                    'password': passwordController.text,
+                    'labels': jsonEncode(selectedSkills.map((skill) => {'label_name': skill}).toList()),
+                    'regions': jsonEncode(selectedRegions.map((region) => {'region_name': region, 'country': 'YOUR_COUNTRY_NAME'}).toList()),
+                    };
+
+                    await UserPreferences().saveUserData(
+                        firstName: userInfo['first_name']!,
+                        lastName: userInfo['last_name']!,
+                        location: userInfo['location']!,
+                        emailAddress: userInfo['email_address']!,
+                        phoneNumber: userInfo['phone_number']!,
+                        password: userInfo['password']!,
+                        skills: userInfo['labels']!,
+                        regions: userInfo['regions']!
+                    );
+                    Map<String, String> userData = await UserPreferences().getUserData();
+                    print(userData);
+                    print(statusCode);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('User info created successfully!')),
+                    );
+
+                    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => BottomNavBar()),);
+                    
+
+                }
+                else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error creating user info: $statusCode')),
+                );
+                print('Error updating user info: $statusCode');
+
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error updating user info: $e')),
+                  SnackBar(content: Text('Error creating user info: $e')),
                 );
                 print('Error updating user info: $e');
               }
+              
             },
-            child: Text('Save'),
+            child: Text('Complete'),
           ),
         ],
       ),
@@ -324,7 +348,7 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
   }
 
 
-Future<int> updateUserInfo() async {
+Future<dynamic> updateUserInfo() async {
   ;
   Map<String, dynamic> userMap = {
     'first_name': firstNameController.text,
@@ -389,7 +413,6 @@ Future<List<String>> fetchAllRegions() async {
     Map<String, dynamic> jsonResponse = json.decode(response.body);
     if (jsonResponse['code'] == 200) {
       List<dynamic> labelsData = jsonResponse['message'];
-      // extract here all the regions from the list of dictionaries
       return labelsData.map((data) => data['region_name'] as String).toList();
     } else {
       throw Exception('Unexpected response from the backend: ${jsonResponse['message']}');
@@ -406,6 +429,9 @@ Future<List<String>> fetchAllRegions() async {
     lastNameController.dispose();
     emailController.dispose();
     phoneNumberController.dispose();
+    locationController.dispose();
+    regionsController.dispose();
+    passwordController.dispose();
     skillsController.dispose();
     super.dispose();
   }
