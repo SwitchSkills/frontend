@@ -6,13 +6,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 
-final List<String> allSkills = ['Java', 'Python', 'Flutter', 'Dart', 'JavaScript', 'React', 'Angular', 'Vue'];
-
 class EditProfileScreen extends StatelessWidget {
   final String firstName;
   final String lastName;
   final String email;
   final String phoneNumber;
+  final String location;
 
   const EditProfileScreen({
     Key? key,
@@ -20,6 +19,7 @@ class EditProfileScreen extends StatelessWidget {
     required this.lastName,
     required this.email,
     required this.phoneNumber,
+    required this.location,
   }) : super(key: key);
 
   @override
@@ -37,6 +37,7 @@ class EditProfileScreen extends StatelessWidget {
             lastName: lastName,
             email: email,
             phoneNumber: phoneNumber,
+            location: location,
           ),
         ),
       ),
@@ -58,12 +59,14 @@ class MobileEditProfileScreen extends StatefulWidget {
   final String lastName;
   final String email;
   final String phoneNumber;
+  final String location;
 
   MobileEditProfileScreen({
     required this.firstName,
     required this.lastName,
     required this.email,
     required this.phoneNumber,
+    required this.location,
   });
 
   @override
@@ -76,6 +79,7 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
   late TextEditingController emailController;
   late TextEditingController phoneNumberController;
   late TextEditingController passwordController;
+  late TextEditingController locationController;
   List<String> selectedSkills = [];
   List<String> selectedRegions = [];
   final TextEditingController skillsController = TextEditingController();
@@ -93,6 +97,7 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
     emailController = TextEditingController(text: widget.email);
     phoneNumberController = TextEditingController(text: widget.phoneNumber);
     passwordController = TextEditingController();
+    locationController = TextEditingController(text: widget.location);
   }
 
   @override
@@ -114,6 +119,15 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
             controller: lastNameController,
             decoration: InputDecoration(
               labelText: 'Last Name',
+              labelStyle: TextStyle(color: Colors.black),
+              border: OutlineInputBorder(),
+            ),
+          ),
+          SizedBox(height: 12),
+          TextField(
+            controller: locationController,
+            decoration: InputDecoration(
+              labelText: 'Your Location',
               labelStyle: TextStyle(color: Colors.black),
               border: OutlineInputBorder(),
             ),
@@ -283,6 +297,7 @@ Future<int> updateUserInfo() async {
   Map<String, dynamic> userMap = {
     'first_name': firstNameController.text,
     'last_name': lastNameController.text,
+    'location': locationController.text,
     'email_address': emailController.text,
     'phone_number': phoneNumberController.text,
     'password': passwordController.text,

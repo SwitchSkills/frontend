@@ -41,6 +41,7 @@ class MobileProfileScreen extends StatelessWidget {
   final List<String> regions = ["Limburg", "Vlaams-Brabant"];
   final String email = "dag.malstaf@example.com";
   final String telephone = "+1234567890";
+  final String location = "Hasselt";
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +60,7 @@ class MobileProfileScreen extends StatelessWidget {
             regions: regions,
             email: email,
             telephone: telephone,
+            location: location,
           ),
           SizedBox(height: 10),
                    

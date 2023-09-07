@@ -9,6 +9,7 @@ class ProfileInformation extends StatelessWidget {
   final List<String> regions;
   final String email;
   final String telephone;
+  final String location;
 
   ProfileInformation({
     required this.profilePictureUrl,
@@ -18,6 +19,7 @@ class ProfileInformation extends StatelessWidget {
     required this.regions,
     required this.email,
     required this.telephone,
+    required this.location,
   });
 
   @override
@@ -62,6 +64,8 @@ class ProfileInformation extends StatelessWidget {
                 SizedBox(height: 5),
                 Text("Phone: $telephone", style: TextStyle(color: Colors.black)),
                 SizedBox(height: 5),
+                Text("Location: $location", style: TextStyle(color: Colors.black)),
+                SizedBox(height: 5),
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
@@ -73,6 +77,7 @@ class ProfileInformation extends StatelessWidget {
                             lastName: '$lastName',
                             email: '$email',
                             phoneNumber: '$telephone',
+                            location: '$location',
                           ),
                         ),
                       );
