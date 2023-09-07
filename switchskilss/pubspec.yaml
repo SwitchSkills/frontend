@@ -28,6 +28,7 @@ dependencies:
   url_launcher: ^6.0.12
   share: ^2.0.4
   flutter_typeahead: ^4.7.0
+  http: ^0.13.3
 
 
 
