@@ -84,21 +84,42 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
   List<String> selectedRegions = [];
   final TextEditingController skillsController = TextEditingController();
   final TextEditingController regionsController = TextEditingController();
-  final List<String> allSkills = ['Java', 'Flutter', 'Python', 'C++', 'Dart', 'React', 'Node.js']; 
+  List<String> allSkills = [];
   final List<String> allRegions = ['Limburg', 'Antwerpen', 'West-Vlaanderen'];
   bool isPasswordObscured = true;
-
+final String backendUrl = 'https://ethereal-yen-394407.ew.r.appspot.com/';
 
   @override
-  void initState() {
-    super.initState();
-    firstNameController = TextEditingController(text: widget.firstName);
-    lastNameController = TextEditingController(text: widget.lastName);
-    emailController = TextEditingController(text: widget.email);
-    phoneNumberController = TextEditingController(text: widget.phoneNumber);
-    passwordController = TextEditingController();
-    locationController = TextEditingController(text: widget.location);
+void initState() {
+  super.initState();
+
+  _loadSkills();
+
+  firstNameController = TextEditingController(text: widget.firstName);
+  lastNameController = TextEditingController(text: widget.lastName);
+  emailController = TextEditingController(text: widget.email);
+  phoneNumberController = TextEditingController(text: widget.phoneNumber);
+  passwordController = TextEditingController();
+  locationController = TextEditingController(text: widget.location);
+}
+
+void _loadSkills() async {
+  try {
+    List<String> skills = await fetchAllSkills();
+    setState(() {
+      allSkills = skills;
+    });
+  } catch (e) {
+    print("Error fetching skills: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error fetching skills: $e')),
+    );
   }
+}
+String fullUrl(String route) {
+  return backendUrl + route;
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -292,7 +313,7 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
     );
   }
 Future<int> updateUserInfo() async {
-  final String backendUrl = 'https://ethereal-yen-394407.ew.r.appspot.com/user';
+  ;
   
   Map<String, dynamic> userMap = {
     'first_name': firstNameController.text,
@@ -306,7 +327,7 @@ Future<int> updateUserInfo() async {
   };
 
   final response = await http.post(
-    Uri.parse(backendUrl),
+    Uri.parse(fullUrl('user')),
     headers: {'Content-Type': 'application/json'},
     body: json.encode(userMap),
   );
@@ -330,6 +351,23 @@ Future<int> updateUserInfo() async {
     throw Exception('Failed to update user info: $errorMessage');
   }
 }
+Future<List<String>> fetchAllSkills() async {
+  final Uri uri = Uri.parse(fullUrl('all_labels'));
+  final response = await http.get(uri);
+
+  if (response.statusCode == 200) {
+    Map<String, dynamic> jsonResponse = json.decode(response.body);
+    if (jsonResponse['code'] == 200) {
+      List<dynamic> labelsData = jsonResponse['message'];
+      return labelsData.map((data) => data['label_name'] as String).toList();
+    } else {
+      throw Exception('Unexpected response from the backend: ${jsonResponse['message']}');
+    }
+  } else {
+    throw Exception('Failed to load skills from the backend');
+  }
+}
+
 
 
   @override
