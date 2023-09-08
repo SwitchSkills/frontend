@@ -5,6 +5,8 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../../user_preferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class AddPostScreen extends StatelessWidget {
   const AddPostScreen({Key? key,}) : super(key: key);
@@ -58,6 +60,10 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
   final TextEditingController regionsController = TextEditingController();
   
   final String backendUrl = 'https://ethereal-yen-394407.ew.r.appspot.com/';
+
+  File? _image;
+
+  final picker = ImagePicker();
 
   @override
   void initState() {
@@ -225,6 +231,17 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
               );
             }).toList(),
           ),
+          SizedBox(height: 12),
+
+        
+          ElevatedButton(
+            onPressed: _pickImage,
+            child: Text('Choose an Image'),
+          ),
+          SizedBox(height: 12),
+          if (_image != null) Image.file(_image!, height: 200, width: 200, fit: BoxFit.cover),
+
+
 
           Spacer(),
           ElevatedButton(
@@ -250,6 +267,21 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
       ),
     );
   }
+
+Future<void> _pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No image selected')),
+        );
+      }
+    });
+  }
+
 
 Future<int> addPost() async {
   Map<String, String> userData = await UserPreferences().getUserData();
