@@ -30,7 +30,8 @@ dependencies:
   flutter_typeahead: ^4.7.0
   http: ^0.13.3
   shared_preferences: ^2.2.1
-
+  image_picker: ^1.0.4
+  firebase_storage: ^11.2.6
 
 
 

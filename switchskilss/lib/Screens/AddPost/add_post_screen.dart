@@ -1,36 +1,26 @@
 import 'package:flutter/material.dart';
-import '../../../components/background.dart';
-import '../../../responsive.dart';
+import '../../components/background.dart';
+import '../../responsive.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../../../components/bottom_nav_bar.dart';
 import '../../../user_preferences.dart';
 
-
-class FullSingupScreen extends StatelessWidget {
-  final String email;
-  final String password;
-
-  const FullSingupScreen({
-    Key? key,
-    required this.email,
-    required this.password,
-  }) : super(key: key);
+class AddPostScreen extends StatelessWidget {
+  const AddPostScreen({Key? key,}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Complete Your Profile'),
+        title: Text('Add Post'),
         backgroundColor: Colors.orange,
       ),
       body: SafeArea(
         child: Responsive(
-          desktop: DesktopFullSignupScreen(),
-          mobile: MobileFullSignupScreen(
-            email: email,
-            password: password,
+          desktop: DesktopAddPostScreen(),
+          mobile: MobileAddPostScreen(
+            
           ),
         ),
       ),
@@ -38,7 +28,7 @@ class FullSingupScreen extends StatelessWidget {
   }
 }
 
-class DesktopFullSignupScreen extends StatelessWidget {
+class DesktopAddPostScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -47,33 +37,26 @@ class DesktopFullSignupScreen extends StatelessWidget {
   }
 }
 
-class MobileFullSignupScreen extends StatefulWidget {
-  final String email;
-  final String password;
-
-  MobileFullSignupScreen({
-    required this.email,
-    required this.password,
-  });
+class MobileAddPostScreen extends StatefulWidget {
 
   @override
-  _MobileFullSignupScreenState createState() => _MobileFullSignupScreenState();
+  _MobileAddPostScreenState createState() => _MobileAddPostScreenState();
 }
 
-class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
-  late TextEditingController firstNameController;
-  late TextEditingController lastNameController;
-  late TextEditingController emailController;
-  late TextEditingController phoneNumberController;
-  late TextEditingController passwordController;
+
+class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
+  late TextEditingController titleController;
+  late TextEditingController descriptionController;
   late TextEditingController locationController;
+  
   List<String> selectedSkills = [];
   List<String> selectedRegions = [];
-  final TextEditingController skillsController = TextEditingController();
-  final TextEditingController regionsController = TextEditingController();
   List<String> allSkills = [];
   List<String> allRegions = [];
-  bool isPasswordObscured = true;
+
+  final TextEditingController skillsController = TextEditingController();
+  final TextEditingController regionsController = TextEditingController();
+  
   final String backendUrl = 'https://ethereal-yen-394407.ew.r.appspot.com/';
 
   @override
@@ -82,13 +65,10 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
 
   _loadSkills();
   _loadRegions();
-  firstNameController = TextEditingController();
-  lastNameController = TextEditingController();
- 
-  phoneNumberController = TextEditingController();
+
+  titleController = TextEditingController();
+  descriptionController = TextEditingController();
   locationController = TextEditingController();
-  emailController = TextEditingController(text: widget.email);
-  passwordController = TextEditingController(text: widget.password);
   }
 
   void _loadSkills() async {
@@ -132,18 +112,18 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
       child: Column(
         children: [
           TextField(
-            controller: firstNameController,
+            controller: titleController,
             decoration: InputDecoration(
-              labelText: 'First Name',
+              labelText: 'Title',
               labelStyle: TextStyle(color: Colors.black),
               border: OutlineInputBorder(),
             ),
           ),
           SizedBox(height: 12),
           TextField(
-            controller: lastNameController,
+            controller: descriptionController,
             decoration: InputDecoration(
-              labelText: 'Last Name',
+              labelText: 'Description',
               labelStyle: TextStyle(color: Colors.black),
               border: OutlineInputBorder(),
             ),
@@ -152,52 +132,13 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
           TextField(
             controller: locationController,
             decoration: InputDecoration(
-              labelText: 'Your Location',
-              labelStyle: TextStyle(color: Colors.black),
-              border: OutlineInputBorder(),
-            ),
-          ),
-          SizedBox(height: 12),
-          TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              labelText: 'Email',
-              labelStyle: TextStyle(color: Colors.black),
-              border: OutlineInputBorder(),
-            ),
-          ),
-          SizedBox(height: 12),
-          TextField(
-            controller: phoneNumberController,
-            decoration: InputDecoration(
-              labelText: 'Phone Number',
+              labelText: 'Job Location',
               labelStyle: TextStyle(color: Colors.black),
               border: OutlineInputBorder(),
             ),
           ),
           SizedBox(height: 12),
           
-          TextField(
-            controller: passwordController,
-            decoration: InputDecoration(
-              labelText: 'Password',
-              labelStyle: TextStyle(color: Colors.black),
-              border: OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  isPasswordObscured ? Icons.visibility : Icons.visibility_off,
-                ),
-                onPressed: () {
-                  setState(() {
-                    isPasswordObscured = !isPasswordObscured;
-                  });
-                },
-              ),
-            ),
-            obscureText: isPasswordObscured,
-          ),
-          
-          SizedBox(height: 12),
           TypeAheadFormField<String>(
             textFieldConfiguration: TextFieldConfiguration(
               controller: skillsController,
@@ -289,79 +230,44 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
           ElevatedButton(
             onPressed: () async {
               try {
-                int statusCode = await updateUserInfo();
+                int statusCode = await addPost();
                 if (statusCode == 200) {
-                    Map<String, String> userInfo = {
-                    'first_name': firstNameController.text,
-                    'last_name': lastNameController.text,
-                    'location': locationController.text,
-                    'email_address': emailController.text,
-                    'phone_number': phoneNumberController.text,
-                    'password': passwordController.text,
-                    'labels': jsonEncode(selectedSkills.map((skill) => {'label_name': skill}).toList()),
-                    'regions': jsonEncode(selectedRegions.map((region) => {'region_name': region, 'country': 'Belgium'}).toList()),
-                    };
-
-
-                    await UserPreferences().saveUserData(
-                        firstName: userInfo['first_name']!,
-                        lastName: userInfo['last_name']!,
-                        location: userInfo['location']!,
-                        emailAddress: userInfo['email_address']!,
-                        phoneNumber: userInfo['phone_number']!,
-                        password: userInfo['password']!,
-                        skills: userInfo['labels']!,
-                        regions: userInfo['regions']!
-                    );
-                
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('User info created successfully!')),
-                    );
-
-                    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => BottomNavBar()),);
-                    
-
-                }
-                else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error creating user info: $statusCode')),
-                );
-                print('Error updating user info: $statusCode');
-
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Post add successfully!')),
+                  );
+                  print(statusCode);
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error creating user info: $e')),
+                  SnackBar(content: Text('Error adding post: $e')),
                 );
-                print('Error updating user info: $e');
+                print('Error adding post: $e');
               }
-              
             },
-            child: Text('Complete'),
+            child: Text('Post'),
           ),
         ],
       ),
     );
   }
 
+Future<int> addPost() async {
+  Map<String, String> userData = await UserPreferences().getUserData();
 
-Future<int> updateUserInfo() async {
-  ;
-  Map<String, dynamic> userMap = {
-    'first_name': firstNameController.text,
-    'last_name': lastNameController.text,
+  Map<String, dynamic> jobMap = {
+    'title': titleController.text,
+    'description': descriptionController.text,
     'location': locationController.text,
-    'email_address': emailController.text,
-    'phone_number': phoneNumberController.text,
-    'password': passwordController.text,
     'labels': selectedSkills.map((skill) => {'label_name': skill}).toList(),
     'regions': selectedRegions.map((region) => {'region_name': region, 'country': 'Belgium'}).toList(),
+    'first_name_owner': userData['first_name'] ?? '',
+    'last_name_owner': userData['last_name'] ?? '',
   };
 
   final response = await http.post(
-    Uri.parse(fullUrl('user')),
+    Uri.parse(fullUrl('job')),
     headers: {'Content-Type': 'application/json'},
-    body: json.encode(userMap),
+    body: json.encode(jobMap),
   );
 
   Map<String, dynamic> jsonResponse = json.decode(response.body);
@@ -380,10 +286,12 @@ Future<int> updateUserInfo() async {
       errorMessage = "Unexpected error format from the backend.";
     }
 
-    throw Exception('Failed to update user info: $errorMessage');
+    throw Exception('Failed to submit the post: $errorMessage');
   }
 }
 
+
+////////////////////////////////////////////////////////////////
 
 Future<List<String>> fetchAllSkills() async {
   final Uri uri = Uri.parse(fullUrl('all_labels'));
@@ -422,14 +330,11 @@ Future<List<String>> fetchAllRegions() async {
 
   @override
   void dispose() {
-    firstNameController.dispose();
-    lastNameController.dispose();
-    emailController.dispose();
-    phoneNumberController.dispose();
+    titleController.dispose();
+    descriptionController.dispose();
     locationController.dispose();
-    regionsController.dispose();
-    passwordController.dispose();
     skillsController.dispose();
+    regionsController.dispose();
     super.dispose();
   }
 }

@@ -4,6 +4,8 @@ import '../../responsive.dart';
 import 'components/profile_information.dart';
 import '../../components/user_job_post.dart';
 import '../../components/liked_jobs_counter.dart';
+import 'dart:convert';
+import '../../../user_preferences.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -31,17 +33,48 @@ class DesktopProfileScreen extends StatelessWidget {
     );
   }
 }
+class MobileProfileScreen extends StatefulWidget {
+  @override
+  _MobileProfileScreenState createState() => _MobileProfileScreenState();
+}
 
 
-class MobileProfileScreen extends StatelessWidget {
-  final String profilePictureUrl = 'assets/images/profile_pic.jpg';
-  final String firstName = "Dag";
-  final String lastName = "Malstaf";
-  final List<String> skills = ["Flutter", "Dart", "Firebase"];
-  final List<String> regions = ["Limburg", "Vlaams-Brabant"];
-  final String email = "dag.malstaf@example.com";
-  final String telephone = "+1234567890";
-  final String location = "Hasselt";
+class _MobileProfileScreenState extends State<MobileProfileScreen> {
+  String profilePictureUrl = '';
+  String firstName = "";
+  String lastName = "";
+  List<String> skills = [];
+  List<String> regions = [];
+  String email = "";
+  String telephone = "";
+  String location = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  _loadUserData() async {
+    Map<String, String> userData = await UserPreferences().getUserData();
+
+    List<dynamic> decodedSkillsList = jsonDecode(userData['labels'] ?? '[]');
+    List<dynamic> decodedRegionsList = jsonDecode(userData['regions'] ?? '[]');
+
+    List<Map<String, String>> decodedSkills = decodedSkillsList.cast<Map<String, String>>();
+    List<Map<String, String>> decodedRegions = decodedRegionsList.cast<Map<String, String>>();
+
+    setState(() {
+      firstName = userData['first_name'] ?? '';
+      lastName = userData['last_name'] ?? '';
+      email = userData['email_address'] ?? '';
+      telephone = userData['phone_number'] ?? '';
+      location = userData['location'] ?? '';
+      skills = decodedSkills.map((skillMap) => skillMap['label_name'] as String).toList();
+      regions = decodedRegions.map((regionMap) => regionMap['region_name'] as String).toList();
+    });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +85,7 @@ class MobileProfileScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(height: 10),
+
           ProfileInformation(
             profilePictureUrl: profilePictureUrl,
             firstName: firstName,
