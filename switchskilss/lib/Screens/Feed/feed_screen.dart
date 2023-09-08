@@ -4,6 +4,8 @@ import '../../responsive.dart';
 import '../../components/job_post.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../../user_preferences.dart';
+
 
 class FeedScreen extends StatefulWidget {
   const FeedScreen({Key? key}) : super(key: key);
@@ -40,28 +42,49 @@ class _FeedScreenState extends State<FeedScreen> {
     );
   }
 
-  void toggleFeed() {
+  void toggleFeed() async {
+    Map<String, dynamic> userDetails = await getUserDetails();
+
     setState(() {
       isActivityFeed = !isActivityFeed;
     });
 
     if (isActivityFeed) {
-      fetchFeed(activityFeedArgs: [
-        {
-          'country': 'Belgium',
-          'region_name': 'Limburg',
-        },
-      ]);
+      fetchFeed(activityFeedArgs: userDetails['regions']);
     } else {
       fetchFeed(matchJobsArgs: {
-        'first_name': 'Nation',
-        'last_name': 'Builder',
+        'first_name': userDetails['first_name'],
+        'last_name': userDetails['last_name'],
       });
     }
   }
 
+  Future<Map<String, dynamic>> getUserDetails() async {
+    final userData = await UserPreferences().getUserData();
+    List<dynamic> decodedRegions = jsonDecode(userData['regions']!);
+
+    List<Map<String, dynamic>> regionsList = decodedRegions.map((region) {
+      return {
+        'country': region['country'],
+        'region_name': region['region_name'],
+      };
+    }).toList();
+
+    return {
+      'first_name': userData['first_name']!,
+      'last_name': userData['last_name']!,
+      'regions': regionsList
+    };
+  }
+
+
+
+
+
+
+
   Future<void> fetchFeed({
-  List<Map<String, String>>? activityFeedArgs, 
+  List<Map<String, dynamic>>? activityFeedArgs, 
   Map<String, String>? matchJobsArgs,
     }) async {
       String url;
@@ -87,7 +110,6 @@ class _FeedScreenState extends State<FeedScreen> {
         var responseData = json.decode(response.body);
         print(responseData);
 
-        // Ensure that the response contains the expected keys
         if (responseData.containsKey('code') && responseData['code'] == 200 && responseData.containsKey('message')) {
           var jobsList = responseData['message'];
 
@@ -184,7 +206,7 @@ class MobileFeedScreen extends StatelessWidget {
                     phoneNumber: job['phone_number'] ?? '',
                     emailAddress: job['email_address'] ?? '',
                     userLocation: job['user_location'] ?? '',
-                    starRating: 4.5, // Static for now. Adjust based on your backend if required.
+                    starRating: 4.5,
                   );
 
                 },

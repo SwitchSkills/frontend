@@ -326,6 +326,8 @@ Future<void> _uploadImage(File image) async {
 
 Future<int> addPost() async {
   Map<String, String> userData = await UserPreferences().getUserData();
+  String firstNameOwner = userData['first_name']!;
+  String lastNameOwner = userData['last_name']!;
 
   Map<String, dynamic> jobMap = {
     'title': titleController.text,
@@ -340,12 +342,9 @@ Future<int> addPost() async {
       'region_name': selectedRegions.first, 
       'country': 'Belgium'
     },
-    'first_name_owner': 'Nation',
-    'last_name_owner':'Builder',
-    //'last_name_owner': userData['Tester'] ?? '',
+    'first_name_owner': firstNameOwner,
+    'last_name_owner':lastNameOwner,
   };
-
-  print(jobMap);
 
   final response = await http.post(
     Uri.parse(fullUrl('job')),
