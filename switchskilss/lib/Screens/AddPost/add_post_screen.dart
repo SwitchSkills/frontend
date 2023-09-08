@@ -7,6 +7,7 @@ import 'dart:convert';
 import '../../../user_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AddPostScreen extends StatelessWidget {
   const AddPostScreen({Key? key,}) : super(key: key);
@@ -60,8 +61,10 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
   final TextEditingController regionsController = TextEditingController();
   
   final String backendUrl = 'https://ethereal-yen-394407.ew.r.appspot.com/';
+  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
   File? _image;
+  String? _uploadedImageUrl;
 
   final picker = ImagePicker();
 
@@ -252,7 +255,7 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Post add successfully!')),
                   );
-                  print(statusCode);
+                  Navigator.pop(context);
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -260,6 +263,7 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
                 );
                 print('Error adding post: $e');
               }
+
             },
             child: Text('Post'),
           ),
@@ -268,12 +272,51 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
     );
   }
 
-Future<void> _pickImage() async {
+// FIREBASE //////////////////////////////////
+
+Future<void> _uploadImage(File image) async {
+  try {
+    // Extracting the file extension
+    String fileExtension = image.uri.path.split('.').last;
+
+    // Generating the random number
+    String randomNumber = (Random().nextDouble()).toString();
+
+    // Constructing the file name based on your format
+    // Replace these with actual values if they are dynamic
+    String title = titleController.text; 
+    String firstName = firstNameController.text; // Assuming you have a controller for this
+    String lastName = lastNameController.text; // Assuming you have a controller for this
+    String region = regionController.text; // Assuming you have a controller for this
+
+    String fileName = 'job_picture_${title}_$firstName_$lastName_$randomNumber.$fileExtension';
+
+    // Upload the image to Firebase Storage under the correct region folder
+    TaskSnapshot snapshot = await _firebaseStorage.ref('$region/$fileName').putFile(image);
+    
+    // Retrieve the URL of the uploaded image
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    
+    setState(() {
+      _uploadedImageUrl = downloadUrl;
+    });
+    
+  } catch (e) {
+    print("Error uploading image: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error uploading image: $e')),
+    );
+  }
+}
+
+
+  Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
+        _uploadImage(_image!);  // Upload the image to Firebase Storage immediately after picking
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('No image selected')),
@@ -289,12 +332,22 @@ Future<int> addPost() async {
   Map<String, dynamic> jobMap = {
     'title': titleController.text,
     'description': descriptionController.text,
+    'picture': {
+      'picture_location_firebase': imageUrl,  // Updated this with the Firebase Storage URL
+      'description': 'Uploaded image for post',  // You can change this description as needed
+    },
     'location': locationController.text,
     'labels': selectedSkills.map((skill) => {'label_name': skill}).toList(),
-    'regions': selectedRegions.map((region) => {'region_name': region, 'country': 'Belgium'}).toList(),
-    'first_name_owner': userData['first_name'] ?? '',
-    'last_name_owner': userData['last_name'] ?? '',
+    'region': {
+      'region_name': selectedRegions.first, 
+      'country': 'Belgium'
+    },
+    'first_name_owner': 'Nation',
+    'last_name_owner':'Builder',
+    //'last_name_owner': userData['Tester'] ?? '',
   };
+
+  print(jobMap);
 
   final response = await http.post(
     Uri.parse(fullUrl('job')),
@@ -303,6 +356,8 @@ Future<int> addPost() async {
   );
 
   Map<String, dynamic> jsonResponse = json.decode(response.body);
+
+  print(jsonResponse);
 
   if (jsonResponse['code'] == 200) {
     return 200;

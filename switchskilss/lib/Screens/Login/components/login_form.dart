@@ -19,9 +19,9 @@ class LoginForm extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             cursorColor: Colors.white,
-            onSaved: (email) {},
+            onSaved: (firstname) {},
             decoration: InputDecoration(
-              hintText: "Your email",
+              hintText: "Your first name",
               hintStyle: TextStyle(
                 color: Colors.white,
               ),
@@ -29,6 +29,26 @@ class LoginForm extends StatelessWidget {
                 padding: const EdgeInsets.all(defaultPadding),
                 child: Icon(
                   Icons.person,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 12),
+          TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            cursorColor: Colors.white,
+            onSaved: (lastname) {},
+            decoration: InputDecoration(
+              hintText: "Your last name",
+              hintStyle: TextStyle(
+                color: Colors.white,
+              ),
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(defaultPadding),
+                child: Icon(
+                  Icons.people,
                   color: Colors.white,
                 ),
               ),
