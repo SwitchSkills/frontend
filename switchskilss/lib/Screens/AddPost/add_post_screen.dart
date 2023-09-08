@@ -8,6 +8,8 @@ import '../../../user_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:math';
+
 
 class AddPostScreen extends StatelessWidget {
   const AddPostScreen({Key? key,}) : super(key: key);
@@ -276,22 +278,18 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
 
 Future<void> _uploadImage(File image) async {
   try {
-    // Extracting the file extension
     String fileExtension = image.uri.path.split('.').last;
 
-    // Generating the random number
     String randomNumber = (Random().nextDouble()).toString();
 
-    // Constructing the file name based on your format
-    // Replace these with actual values if they are dynamic
     String title = titleController.text; 
-    String firstName = firstNameController.text; // Assuming you have a controller for this
-    String lastName = lastNameController.text; // Assuming you have a controller for this
-    String region = regionController.text; // Assuming you have a controller for this
+    String firstName = 'Nation';
+    String lastName = 'Builder';
+    String region = selectedRegions.first;
 
-    String fileName = 'job_picture_${title}_$firstName_$lastName_$randomNumber.$fileExtension';
+    String fileName = 'job_picture_${title}_${firstName}_${lastName}_${randomNumber}.${fileExtension}';
+    print(fileName);
 
-    // Upload the image to Firebase Storage under the correct region folder
     TaskSnapshot snapshot = await _firebaseStorage.ref('$region/$fileName').putFile(image);
     
     // Retrieve the URL of the uploaded image
@@ -316,7 +314,7 @@ Future<void> _uploadImage(File image) async {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        _uploadImage(_image!);  // Upload the image to Firebase Storage immediately after picking
+        _uploadImage(_image!);  
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('No image selected')),
@@ -333,8 +331,8 @@ Future<int> addPost() async {
     'title': titleController.text,
     'description': descriptionController.text,
     'picture': {
-      'picture_location_firebase': imageUrl,  // Updated this with the Firebase Storage URL
-      'description': 'Uploaded image for post',  // You can change this description as needed
+      'picture_location_firebase': _uploadedImageUrl, 
+      'description': 'Uploaded image for post',  
     },
     'location': locationController.text,
     'labels': selectedSkills.map((skill) => {'label_name': skill}).toList(),
