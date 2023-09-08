@@ -290,44 +290,38 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
             onPressed: () async {
               try {
                 int statusCode = await updateUserInfo();
+
                 if (statusCode == 200) {
-                    Map<String, String> userInfo = {
-                    'first_name': firstNameController.text,
-                    'last_name': lastNameController.text,
-                    'location': locationController.text,
-                    'email_address': emailController.text,
-                    'phone_number': phoneNumberController.text,
-                    'password': passwordController.text,
-                    'labels': jsonEncode(selectedSkills.map((skill) => {'label_name': skill}).toList()),
-                    'regions': jsonEncode(selectedRegions.map((region) => {'region_name': region, 'country': 'Belgium'}).toList()),
-                    };
+                  // Log in and fetch user details after signup
+                  final userDetails = await loginUserAndFetchDetails(emailController.text, passwordController.text);
 
+                  // Save user details to UserPreferences
+                  await UserPreferences().saveUserData(
+                    userId: userDetails['user_id'],
+                    firstName: userDetails['first_name'],
+                    lastName: userDetails['last_name'],
+                    emailAddress: userDetails['email_address'],
+                    phoneNumber: userDetails['phone_number'],
+                    alternativeCommunication: userDetails['alternative_communication'] ?? '',
+                    bibliography: userDetails['bibliography'] ?? '',
+                    location: userDetails['location'],
+                    password: userDetails['password'],
+                    pictureLocationFirebase: userDetails['picture_location_firebase'] ?? '',
+                    pictureDescription: userDetails['picture_description'] ?? '',
+                    regions: jsonEncode(userDetails['regions']),
+                  );
 
-                    await UserPreferences().saveUserData(
-                        firstName: userInfo['first_name']!,
-                        lastName: userInfo['last_name']!,
-                        location: userInfo['location']!,
-                        emailAddress: userInfo['email_address']!,
-                        phoneNumber: userInfo['phone_number']!,
-                        password: userInfo['password']!,
-                        skills: userInfo['labels']!,
-                        regions: userInfo['regions']!
-                    );
-                
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('User info created successfully!')),
-                    );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('User info created successfully!')),
+                  );
 
-                    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => BottomNavBar()),);
-                    
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavBar()));
 
-                }
-                else {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Error creating user info: $statusCode')),
-                );
-                print('Error updating user info: $statusCode');
-
+                  );
+                  print('Error updating user info: $statusCode');
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -335,14 +329,40 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
                 );
                 print('Error updating user info: $e');
               }
-              
             },
             child: Text('Complete'),
           ),
+
         ],
       ),
     );
   }
+
+Future<Map<String, dynamic>> loginUserAndFetchDetails(String emailAddress, String password) async {
+  Map<String, dynamic> loginData = {
+    'type': 'email_address',
+    'search': emailAddress,
+    'password': password,
+  };
+
+  final response = await http.post(
+    Uri.parse(fullUrl('login')),
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode(loginData),
+  );
+
+  if (response.statusCode == 200) {
+    var jsonResponse = json.decode(response.body);
+    if (jsonResponse['code'] == 200) {
+      return jsonResponse['message'][0];
+    } else {
+      throw Exception(jsonResponse['message']);
+    }
+  } else {
+    throw Exception('Failed to login and fetch user details.');
+  }
+}
+
 
 
 Future<int> updateUserInfo() async {
