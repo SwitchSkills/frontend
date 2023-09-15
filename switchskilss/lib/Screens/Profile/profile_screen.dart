@@ -6,6 +6,8 @@ import '../../components/user_job_post.dart';
 import '../../components/liked_jobs_counter.dart';
 import 'dart:convert';
 import '../../../user_preferences.dart';
+import 'package:http/http.dart' as http;
+
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -48,32 +50,51 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
   String email = "";
   String telephone = "";
   String location = "";
+  List<dynamic> userJobs = [];
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _fetchUserDataAndJobs();
   }
 
-  _loadUserData() async {
-    Map<String, String> userData = await UserPreferences().getUserData();
+  Future<void> _fetchUserDataAndJobs() async {
+    final Map<String, String> userData = await UserPreferences().getUserData();
+    print("##########################");
+    print(userData);
+    firstName = userData['first_name'] ?? "";
+    lastName = userData['last_name'] ?? "";
 
-    List<dynamic> decodedSkillsList = jsonDecode(userData['labels'] ?? '[]');
-    List<dynamic> decodedRegionsList = jsonDecode(userData['regions'] ?? '[]');
 
-    List<Map<String, String>> decodedSkills = decodedSkillsList.cast<Map<String, String>>();
-    List<Map<String, String>> decodedRegions = decodedRegionsList.cast<Map<String, String>>();
+    final response = await http.post(
+      Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/jobs_owned_by_user'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'first_name': firstName,
+        'last_name': lastName,
+      }),
+    );
 
-    setState(() {
-      firstName = userData['first_name'] ?? '';
-      lastName = userData['last_name'] ?? '';
-      email = userData['email_address'] ?? '';
-      telephone = userData['phone_number'] ?? '';
-      location = userData['location'] ?? '';
-      skills = decodedSkills.map((skillMap) => skillMap['label_name'] as String).toList();
-      regions = decodedRegions.map((regionMap) => regionMap['region_name'] as String).toList();
-    });
-}
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(response.body);
+      if (responseBody['code'] == 200) {
+        setState(() {
+          userJobs = responseBody['message'];
+          print("##########################");
+          print(userData);
+        });
+      } else {
+        print("Failed to fetch jobs. Server returned: ${responseBody['message']}");
+      }
+    } else {
+      print('Failed to connect to server with status code: ${response.statusCode}');
+    }
+  }
+
+
+
 
 
   @override
@@ -123,29 +144,28 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
             ),
           ),
           SizedBox(height: 20),
-          
-          ...List.generate(JobCounter, (index) { 
-            List<String> tags = [];
-            if (index % 3 == 0) tags = ['Skill 1'];
-            if (index % 3 == 1) tags = ['Skill 1', 'Skill 2'];
-            if (index % 3 == 2) tags = ['Skill 1', 'Skill 2', 'Skill 3'];
 
+          ...userJobs.map((job) {
+            print('this is the job');
+            print(job);
             return UserJobPost(
-              profileImageUrl: 'assets/images/profile_pic.jpg',
-              title: 'Your Job $index',
-              description: 'Job description for your job $index...',
-              postImageUrl: 'assets/images/post_pic.png',
-              location: 'Hasselt',
-              tags: tags,
-              firstName: 'First Name $index',
-              lastName: 'Last Name $index',
-              phoneNumber: '+32 471 23 45 67',
-              emailAddress: 'mail@example.com',
-              userLocation: 'User $index Location',
-              starRating: 4.5,
+              profileImageUrl: 'assets/images/profile_pic.jpg', 
+              title: job['title'],
+              description: job['job_description'],
+              postImageUrl: 'assets/images/post_pic.png', 
+              location: job['job_location'],
+              tags: (job['labels'] as List).map((e) => e['labels.label_name'].toString()).toList(),
+              firstName: job['first_name'],
+              lastName: job['last_name'],
+              phoneNumber: job['phone_number'],
+              emailAddress: job['email_address'],
+              userLocation: job['user_location'],
+              starRating: 4.5, 
             );
-          }),
-          SizedBox(height: 20),  
+          }).toList(),
+          
+          SizedBox(height: 20),
+ 
         ],
       ),
     ); 

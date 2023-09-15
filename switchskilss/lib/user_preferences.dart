@@ -22,6 +22,7 @@ class UserPreferences {
     required String pictureLocationFirebase,
     required String pictureDescription,
     required String regions,
+    required String labels,
   }) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -37,6 +38,7 @@ class UserPreferences {
     prefs.setString('picture_location_firebase', pictureLocationFirebase);
     prefs.setString('picture_description', pictureDescription);
     prefs.setString('regions', regions);
+    prefs.setString('labels', labels);
   }
 
   Future<Map<String, String>> getUserData() async {
@@ -55,6 +57,7 @@ class UserPreferences {
       'picture_location_firebase': prefs.getString('picture_location_firebase') ?? 'Default Picture Location Firebase',
       'picture_description': prefs.getString('picture_description') ?? 'Default Picture Description',
       'regions': prefs.getString('regions') ?? '', 
+      'labels' : prefs.getString('labels') ?? '',
     };
   }
 
@@ -73,6 +76,7 @@ class UserPreferences {
     prefs.remove('picture_location_firebase');
     prefs.remove('picture_description');
     prefs.remove('regions');
+    prefs.remove('labels');
 }
 
 }

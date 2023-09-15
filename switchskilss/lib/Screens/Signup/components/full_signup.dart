@@ -292,10 +292,8 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
                 int statusCode = await updateUserInfo();
 
                 if (statusCode == 200) {
-                  // Log in and fetch user details after signup
                   final userDetails = await loginUserAndFetchDetails(emailController.text, passwordController.text);
 
-                  // Save user details to UserPreferences
                   await UserPreferences().saveUserData(
                     userId: userDetails['user_id'],
                     firstName: userDetails['first_name'],
@@ -309,6 +307,7 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
                     pictureLocationFirebase: userDetails['picture_location_firebase'] ?? '',
                     pictureDescription: userDetails['picture_description'] ?? '',
                     regions: jsonEncode(userDetails['regions']),
+                    labels: jsonEncode(selectedSkills.map((skill) => {'label_name': skill}).toList()),
                   );
 
                   ScaffoldMessenger.of(context).showSnackBar(

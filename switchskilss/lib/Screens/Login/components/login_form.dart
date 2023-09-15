@@ -22,6 +22,8 @@ class _LoginFormState extends State<LoginForm> {
   String lastName = ''; 
   String password = '';
 
+  bool isPasswordObscured = true;
+
 
   String fullUrl(String route) {
     return backendUrl + route;
@@ -55,7 +57,6 @@ class _LoginFormState extends State<LoginForm> {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] != 200) {
-        print(responseData['message']);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['message'])),
         );
@@ -76,6 +77,7 @@ class _LoginFormState extends State<LoginForm> {
             pictureLocationFirebase: user['picture_location_firebase'],
             pictureDescription: user['picture_description'],
             regions: jsonEncode(user['regions']),
+            labels: 'nog geen label'
         );
         void printUserData() async {
           final Map<String, String> userData = await UserPreferences().getUserData();
@@ -152,29 +154,38 @@ class _LoginFormState extends State<LoginForm> {
             padding: const EdgeInsets.symmetric(vertical: defaultPadding),
             child: TextFormField(
               textInputAction: TextInputAction.done,
-              obscureText: true,
+              obscureText: isPasswordObscured,
               cursorColor: Colors.white,
               onSaved: (value) {
                 password = value ?? '';
               },
-
               decoration: InputDecoration(
                 hintText: "Your password",
                 hintStyle: TextStyle(
-                color: Colors.white,
+                  color: Colors.white,
                 ),
-                
                 prefixIcon: Padding(
                   padding: const EdgeInsets.all(defaultPadding),
                   child: Icon(
                     Icons.lock,
-                    color: Colors.white
-
+                    color: Colors.white,
                   ),
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    isPasswordObscured ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      isPasswordObscured = !isPasswordObscured;
+                    });
+                  },
                 ),
               ),
             ),
           ),
+
           const SizedBox(height: defaultPadding),
           Hero(
             tag: "login_btn",
