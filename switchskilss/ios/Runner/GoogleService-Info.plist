@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>938009266159-it34u93g7mpun22qrskmf8v8ngvrrunj.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.938009266159-it34u93g7mpun22qrskmf8v8ngvrrunj</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCigvqkrxgmssMofQ90o6HT8J8miin1_H0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>938009266159</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.switchskilss</string>
+	<key>PROJECT_ID</key>
+	<string>switchskills-1c163</string>
+	<key>STORAGE_BUCKET</key>
+	<string>switchskills-1c163.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:938009266159:ios:c46330605d33f442d9981a</string>
+</dict>
+</plist>

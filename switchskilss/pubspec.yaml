@@ -27,7 +27,13 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
   url_launcher: ^6.0.12
   share: ^2.0.4
-
+  flutter_typeahead: ^4.7.0
+  http: ^0.13.3
+  shared_preferences: ^2.2.1
+  image_picker: ^1.0.4
+  firebase_storage: ^11.2.6
+  flutterfire_cli: ^0.2.7
+  firebase_core: ^2.15.1
 
 
 
@@ -37,6 +43,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^2.0.1
+  flutterfire_cli: ^0.2.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

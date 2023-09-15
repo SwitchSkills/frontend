@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "938009266159",
+    "project_id": "switchskills-1c163",
+    "storage_bucket": "switchskills-1c163.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938009266159:android:e11e7a21f5c2bd99d9981a",
+        "android_client_info": {
+          "package_name": "com.example.switchskilss"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "938009266159-60aaghilsar9kgf82e7nspg0qjve34bj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf5jZsmbZWAq5sfGkrb3iOgxC6Sdm6ZHk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "938009266159-60aaghilsar9kgf82e7nspg0qjve34bj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

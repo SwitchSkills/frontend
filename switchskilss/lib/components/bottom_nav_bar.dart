@@ -4,6 +4,9 @@ import '../Screens/Feed/feed_screen.dart';
 import '../Screens/Likes/likes_screen.dart';
 import '../Screens/Search/search_screen.dart';
 import '../Screens/Profile/profile_screen.dart';
+import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
+import '../../../user_preferences.dart';
+import '../Screens/AddPost/add_post_screen.dart';
 
 
 class BottomNavBar extends StatefulWidget {
@@ -31,8 +34,39 @@ class BottomNavBarState extends State<BottomNavBar> {
         title: const Text('SwitchSkills'),
         backgroundColor: Colors.orange,
         automaticallyImplyLeading: false,
-        
+        leading: IconButton(
+          icon: Icon(Icons.logout),  
+          onPressed: () async {
+            try {
+              await UserPreferences().removeUserData();
+              Map<String, String> userData = await UserPreferences().getUserData();
+
+              print(userData);
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => WelcomeScreen(),
+              ));
+
+            } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error logging out the user: $e')),
+                );
+                print('Error logging out the user: $e');
+              }
+            
+          },
         ),
+        actions: [
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddPostScreen()),
+            );
+          },
+        ),
+      ],
+      ),
       body: _pages[_selectedIndex], 
       bottomNavigationBar: SalomonBottomBar(
           currentIndex: _selectedIndex,
@@ -46,6 +80,7 @@ class BottomNavBarState extends State<BottomNavBar> {
           items: _navBarItems),
     );
   }
+
 
   void navigateToLikesScreen() {
     setState(() {

@@ -43,7 +43,38 @@ class MobileLikesScreen extends StatelessWidget {
     return Column(
       children: [
         SizedBox(height: 10),
-        LikedJobsCounter(likedJobsCount: JobCounter),
+        Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Your Liked Jobs",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                ),
+                SizedBox(height: 10),
+                LikedJobsCounter(likedJobsCount: JobCounter),
+              ],
+            ),
+          ),
+        ),
+        
         SizedBox(height: 10),
         Expanded(
           child: ListView.builder(
