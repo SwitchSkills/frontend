@@ -62,6 +62,17 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
     final Map<String, String> userData = await UserPreferences().getUserData();
     firstName = userData['first_name'] ?? "";
     lastName = userData['last_name'] ?? "";
+    List<dynamic> fetchedRegions = json.decode(userData['regions'] ?? '[]');
+    regions = fetchedRegions.map((region) => region['region_name'] as String).toList();
+    List<dynamic> fetchedLabels = json.decode(userData['labels'] ?? '[]');
+    print(fetchedLabels);
+    skills = fetchedLabels.map((label) => label['label_name'] as String).toList();
+
+
+
+    email = userData['email_address'] ?? "";
+    telephone = userData['phone_number'] ?? "";
+    location = userData['location'] ?? "";
 
 
     final response = await http.post(
@@ -80,8 +91,6 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
       if (responseBody['code'] == 200) {
         setState(() {
           userJobs = responseBody['message'];
-          print("##########################");
-          print(userData);
         });
       } else {
         print("Failed to fetch jobs. Server returned: ${responseBody['message']}");
@@ -114,6 +123,7 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
             email: email,
             telephone: telephone,
             location: location,
+            
           ),
           SizedBox(height: 10),
                    
@@ -144,15 +154,17 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
           SizedBox(height: 20),
 
           ...userJobs.map((job) {
-            print("this is the job");
-            print(job);
+            print(job['picture_location_firebase']);
+            
+            
+
             return UserJobPost(
               profileImageUrl: 'assets/images/profile_pic.jpg', 
               title: job['title'] ?? "",
               description: job['job_description'] ?? "",
               postImageUrl: job['picture_location_firebase'] ?? "", 
               location: job['job_location'] ?? "",
-              tags: (job['labels'] as List).map((e) => e['labels.label_name'].toString()).toList(),
+              labels: (job['labels'] as List).map((e) => e['label_name'].toString()).toList(),
               firstName: job['first_name'],
               lastName: job['last_name'],
               phoneNumber: job['phone_number'],

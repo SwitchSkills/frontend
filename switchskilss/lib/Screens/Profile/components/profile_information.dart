@@ -78,6 +78,8 @@ class ProfileInformation extends StatelessWidget {
                             email: '$email',
                             phoneNumber: '$telephone',
                             location: '$location',
+                            labels: skills,   
+                            regions: regions,
                           ),
                         ),
                       );

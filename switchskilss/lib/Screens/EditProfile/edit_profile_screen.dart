@@ -4,6 +4,7 @@ import '../../responsive.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../../user_preferences.dart';
 
 
 class EditProfileScreen extends StatelessWidget {
@@ -12,6 +13,9 @@ class EditProfileScreen extends StatelessWidget {
   final String email;
   final String phoneNumber;
   final String location;
+  final List<String> labels;  
+  final List<String> regions;
+  
 
   const EditProfileScreen({
     Key? key,
@@ -20,6 +24,9 @@ class EditProfileScreen extends StatelessWidget {
     required this.email,
     required this.phoneNumber,
     required this.location,
+    required this.labels,     
+    required this.regions,     
+    
   }) : super(key: key);
 
   @override
@@ -38,6 +45,8 @@ class EditProfileScreen extends StatelessWidget {
             email: email,
             phoneNumber: phoneNumber,
             location: location,
+            labels: labels,
+            regions: regions,
           ),
         ),
       ),
@@ -60,6 +69,8 @@ class MobileEditProfileScreen extends StatefulWidget {
   final String email;
   final String phoneNumber;
   final String location;
+  final List<String> labels;
+  final List<String> regions;
 
   MobileEditProfileScreen({
     required this.firstName,
@@ -67,6 +78,8 @@ class MobileEditProfileScreen extends StatefulWidget {
     required this.email,
     required this.phoneNumber,
     required this.location,
+    required this.labels,
+    required this.regions,
   });
 
   @override
@@ -82,8 +95,8 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
   late TextEditingController locationController;
   List<String> selectedSkills = [];
   List<String> selectedRegions = [];
-  final TextEditingController skillsController = TextEditingController();
-  final TextEditingController regionsController = TextEditingController();
+  late TextEditingController skillsController = TextEditingController();
+  late TextEditingController regionsController = TextEditingController();
   List<String> allSkills = [];
   List<String> allRegions = [];
   bool isPasswordObscured = true;
@@ -96,12 +109,17 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
   _loadSkills();
   _loadRegions();
 
+  selectedSkills = widget.labels;
+  selectedRegions = widget.regions;
+
   firstNameController = TextEditingController(text: widget.firstName);
   lastNameController = TextEditingController(text: widget.lastName);
   emailController = TextEditingController(text: widget.email);
   phoneNumberController = TextEditingController(text: widget.phoneNumber);
   passwordController = TextEditingController();
   locationController = TextEditingController(text: widget.location);
+  skillsController = TextEditingController();
+  regionsController = TextEditingController();
   }
 
   void _loadSkills() async {
@@ -326,16 +344,59 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
 
 Future<int> updateUserInfo() async {
   ;
+  final Map<String, String> userData = await UserPreferences().getUserData();
+  print("####################");
+  print("This is the userData");
+  print(userData);
+
+  String firstNameValue = firstNameController.text.isNotEmpty ? firstNameController.text : userData['first_name'] ?? "";
+  String lastNameValue = lastNameController.text.isNotEmpty ? lastNameController.text : userData['last_name'] ?? "";
+  String locationValue = locationController.text.isNotEmpty ? locationController.text : userData['location'] ?? "";
+  String emailAddressValue = emailController.text.isNotEmpty ? emailController.text : userData['email_address'] ?? "";
+  String phoneNumberValue = phoneNumberController.text.isNotEmpty ? phoneNumberController.text : userData['phone_number'] ?? "";
+  String passwordValue = passwordController.text.isNotEmpty ? passwordController.text : userData['password'] ?? "";
+
+  List<dynamic> fetchedRegions = json.decode(userData['regions'] ?? '[]');
+  List<String> regionsValue = selectedRegions.isNotEmpty ? selectedRegions : fetchedRegions.map((region) => region['region_name'] as String).toList();
+
+  List<dynamic> fetchedLabels = json.decode(userData['labels'] ?? '[]');
+  List<String> skillsValue = selectedSkills.isNotEmpty ? selectedSkills : fetchedLabels.map((label) => label.toString()).toList();
+
   Map<String, dynamic> userMap = {
-    'first_name': firstNameController.text,
-    'last_name': lastNameController.text,
-    'location': locationController.text,
-    'email_address': emailController.text,
-    'phone_number': phoneNumberController.text,
-    'password': passwordController.text,
-    'labels': selectedSkills.map((skill) => {'label_name': skill}).toList(),
-    'regions': selectedRegions.map((region) => {'region_name': region, 'country': 'YOUR_COUNTRY_NAME'}).toList(),
+    'first_name': firstNameValue,
+    'last_name': lastNameValue,
+    'location': locationValue,
+    'email_address': emailAddressValue,
+    'phone_number': phoneNumberValue,
+    'password': passwordValue,
+    'labels': skillsValue.map((skill) => {'label_name': skill}).toList(),
+    'regions': regionsValue.map((region) => {'region_name': region, 'country': 'Belgium'}).toList(),
   };
+
+  await UserPreferences().saveUserData(
+    userId: userData['user_id'] ?? 'Default User Id',
+    firstName: firstNameValue,
+    lastName: lastNameValue,
+    emailAddress: emailAddressValue,
+    phoneNumber: phoneNumberValue,
+    location: locationValue,
+    password: passwordValue,
+    alternativeCommunication: userData['alternative_communication'] ?? 'Default Alternative Communication',
+    bibliography: userData['bibliography'] ?? 'Default Bibliography',
+    pictureLocationFirebase: userData['picture_location_firebase'] ?? 'Default Picture Location Firebase',
+    pictureDescription: userData['picture_description'] ?? 'Default Picture Description',
+    regions: jsonEncode(userMap['regions']),
+    labels: jsonEncode(userMap['labels'])
+  );
+
+  print("####################");
+  print("This is the userMap");
+  print(userMap);
+
+  final Map<String, String> userDataUpdated = await UserPreferences().getUserData();
+  print("####################");
+  print("This is the userDataUpdated");
+  print(userDataUpdated);
 
   final response = await http.post(
     Uri.parse(fullUrl('user')),
@@ -361,6 +422,7 @@ Future<int> updateUserInfo() async {
 
     throw Exception('Failed to update user info: $errorMessage');
   }
+
 }
 
 

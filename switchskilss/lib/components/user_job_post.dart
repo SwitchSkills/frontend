@@ -10,7 +10,7 @@ class UserJobPost extends StatelessWidget {
   final String description;
   final String postImageUrl;
   final String location; 
-  final List<String> tags;
+  final List<String> labels;
   final String firstName; 
   final String lastName;
   final String phoneNumber; 
@@ -25,7 +25,7 @@ class UserJobPost extends StatelessWidget {
     required this.description,
     required this.postImageUrl,
     required this.location, 
-    required this.tags,
+    required this.labels,
     required this.firstName, 
     required this.lastName, 
     required this.phoneNumber, 
@@ -106,6 +106,7 @@ TableRow _createRow(String label, String value) {
 
   @override
 Widget build(BuildContext context) {
+  print(postImageUrl);
   return Card(
     elevation: 5.0,
     shape: RoundedRectangleBorder(
@@ -161,10 +162,12 @@ Widget build(BuildContext context) {
             ],
           ),
           SizedBox(height: 10),
+          
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
+                flex: 4, 
                 child: Text(
                   description,
                   maxLines: 3,
@@ -175,18 +178,22 @@ Widget build(BuildContext context) {
                 ),
               ),
               SizedBox(width: 10),
-              Image.network(
-                postImageUrl,
-                height: 80,
-                width: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset('assets/images/image-not-found.jpg');
-                },
-              )
-
+              
+              Flexible(
+                flex: 1,
+                
+                child: Image.network(
+                  postImageUrl,
+                  height: 80,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset('assets/images/image-not-found.jpg');
+                  },
+                ),
+              ),
             ],
           ),
+
           SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -204,7 +211,7 @@ Widget build(BuildContext context) {
                   child: Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 8,
-                    children: tags.map((tag) => Container(
+                    children: labels.map((tag) => Container(
                       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: Colors.grey,

@@ -270,10 +270,10 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
             style: ElevatedButton.styleFrom(
               primary: _uploadedImageUrl != null
                   ? Theme.of(context).primaryColor
-                  : Theme.of(context).primaryColor.withOpacity(0.5),  // A more muted shade when disabled
+                  : Theme.of(context).primaryColor.withOpacity(0.5),  
               onPrimary: _uploadedImageUrl != null
                   ? Colors.white
-                  : Colors.grey,  // Change text color to grey when disabled
+                  : Colors.grey,  
             ),
           ),
 
@@ -357,6 +357,10 @@ Future<int> addPost() async {
     'first_name_owner': firstNameOwner,
     'last_name_owner':lastNameOwner,
   };
+
+  print("###########");
+  print("This is the job i upload to the backend");
+  print(jobMap);
 
   
 
