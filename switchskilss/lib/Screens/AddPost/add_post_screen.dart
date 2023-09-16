@@ -250,12 +250,12 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
 
           Spacer(),
           ElevatedButton(
-            onPressed: () async {
+            onPressed: _uploadedImageUrl != null ? () async {
               try {
                 int statusCode = await addPost();
                 if (statusCode == 200) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Post add successfully!')),
+                    SnackBar(content: Text('Post added successfully!')),
                   );
                   Navigator.pop(context);
                 }
@@ -265,10 +265,18 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
                 );
                 print('Error adding post: $e');
               }
-
-            },
+            } : null,
             child: Text('Post'),
+            style: ElevatedButton.styleFrom(
+              primary: _uploadedImageUrl != null
+                  ? Theme.of(context).primaryColor
+                  : Theme.of(context).primaryColor.withOpacity(0.5),  // A more muted shade when disabled
+              onPrimary: _uploadedImageUrl != null
+                  ? Colors.white
+                  : Colors.grey,  // Change text color to grey when disabled
+            ),
           ),
+
         ],
       ),
     );
@@ -277,22 +285,22 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
 // FIREBASE //////////////////////////////////
 
 Future<void> _uploadImage(File image) async {
+  final Map<String, String> userData = await UserPreferences().getUserData();
+    String firstNameForm = userData['first_name'] ?? "";
+    String lastNameForm = userData['last_name'] ?? "";
   try {
     String fileExtension = image.uri.path.split('.').last;
-
     String randomNumber = (Random().nextDouble()).toString();
 
     String title = titleController.text; 
-    String firstName = 'Nation';
-    String lastName = 'Builder';
+    String firstName = firstNameForm;
+    String lastName = lastNameForm;
     String region = selectedRegions.first;
 
     String fileName = 'job_picture_${title}_${firstName}_${lastName}_${randomNumber}.${fileExtension}';
-    print(fileName);
 
     TaskSnapshot snapshot = await _firebaseStorage.ref('$region/$fileName').putFile(image);
     
-    // Retrieve the URL of the uploaded image
     String downloadUrl = await snapshot.ref.getDownloadURL();
     
     setState(() {
@@ -308,7 +316,7 @@ Future<void> _uploadImage(File image) async {
 }
 
 
-  Future<void> _pickImage() async {
+   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
@@ -324,7 +332,11 @@ Future<void> _uploadImage(File image) async {
   }
 
 
+
 Future<int> addPost() async {
+  if (_uploadedImageUrl == null) {
+    throw Exception('Image not uploaded yet');
+  }
   Map<String, String> userData = await UserPreferences().getUserData();
   String firstNameOwner = userData['first_name']!;
   String lastNameOwner = userData['last_name']!;
@@ -345,6 +357,8 @@ Future<int> addPost() async {
     'first_name_owner': firstNameOwner,
     'last_name_owner':lastNameOwner,
   };
+
+  
 
   final response = await http.post(
     Uri.parse(fullUrl('job')),

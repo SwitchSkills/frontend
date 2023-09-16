@@ -60,8 +60,6 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
 
   Future<void> _fetchUserDataAndJobs() async {
     final Map<String, String> userData = await UserPreferences().getUserData();
-    print("##########################");
-    print(userData);
     firstName = userData['first_name'] ?? "";
     lastName = userData['last_name'] ?? "";
 
@@ -146,14 +144,14 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
           SizedBox(height: 20),
 
           ...userJobs.map((job) {
-            print('this is the job');
+            print("this is the job");
             print(job);
             return UserJobPost(
               profileImageUrl: 'assets/images/profile_pic.jpg', 
-              title: job['title'],
-              description: job['job_description'],
-              postImageUrl: 'assets/images/post_pic.png', 
-              location: job['job_location'],
+              title: job['title'] ?? "",
+              description: job['job_description'] ?? "",
+              postImageUrl: job['picture_location_firebase'] ?? "", 
+              location: job['job_location'] ?? "",
               tags: (job['labels'] as List).map((e) => e['labels.label_name'].toString()).toList(),
               firstName: job['first_name'],
               lastName: job['last_name'],

@@ -175,12 +175,16 @@ Widget build(BuildContext context) {
                 ),
               ),
               SizedBox(width: 10),
-              Image.asset(
+              Image.network(
                 postImageUrl,
                 height: 80,
                 width: 80,
                 fit: BoxFit.cover,
-              ),
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset('assets/images/image-not-found.jpg');
+                },
+              )
+
             ],
           ),
           SizedBox(height: 10),
