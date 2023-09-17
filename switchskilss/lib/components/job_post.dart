@@ -83,7 +83,7 @@ _showContactOptions(BuildContext context) {
             ListTile(
               leading: Icon(Icons.email, color: Colors.green),
               title: Text('Email'),
-              onTap: () => _launchURL(context, 'tel:${widget.emailAddress}'),
+              onTap: () => _launchURL(context, 'mailto:${widget.emailAddress}'),
             ),
           ],
         ),

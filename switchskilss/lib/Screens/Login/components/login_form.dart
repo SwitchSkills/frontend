@@ -29,38 +29,42 @@ class _LoginFormState extends State<LoginForm> {
     return backendUrl + route;
   }
 
-  Future<List<String>> fetchUserLabels(String firstName, String lastName) async {
-    final response = await http.post(
-      Uri.parse(fullUrl('user')), 
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'first_name': firstName,
-        'last_name': lastName,
-        
-      }),
-    );
+ Future<List<Map<String, String>>> fetchUserLabels(String firstName, String lastName) async {
+  final response = await http.post(
+    Uri.parse(fullUrl('search_users')),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: json.encode({
+      'type': 'full_name',
+      'first_name': firstName,
+      'last_name': lastName,
+    }),
+  );
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      print(responseData);
-      if (responseData['code'] == 200) {
-        var user = responseData['message'][0];
-        print(user);
-        if (user['labels'] != null) {
-          List<dynamic> labelsData = user['labels'];
-          return labelsData.map((labelData) => labelData['label_name'].toString()).toList();
-        } else {
-          return [];
-        }
+  if (response.statusCode == 200) {
+    final responseData = json.decode(response.body);
+    print(responseData);
+    if (responseData['code'] == 200) {
+      var user = responseData['message'][0];
+      print(user);
+      if (user['labels'] != null) {
+        List<dynamic> labelsData = user['labels'];
+        return labelsData.map((labelData) {
+          return {
+            'label_name': labelData['label_name'].toString(),
+          };
+        }).toList();
       } else {
-        throw Exception("Failed to fetch labels. Server returned: ${responseData['message']}");
+        return [];
       }
     } else {
-      throw Exception('Failed to connect to server with status code: ${response.statusCode}');
+      throw Exception("Failed to fetch labels. Server returned: ${responseData['message']}");
     }
+  } else {
+    throw Exception('Failed to connect to server with status code: ${response.statusCode}');
   }
+}
 
   Future<void> _loginUser(BuildContext context) async {
     final form = _formKey.currentState;
@@ -96,9 +100,9 @@ class _LoginFormState extends State<LoginForm> {
       } else {
         if (responseData['message'] is List && responseData['message'].isNotEmpty) {
           var user = responseData['message'][0];
-          // List<String> userLabels = await fetchUserLabels(user['first_name'], user['last_name']);
+          List<Map<String, String>> userLabels = await fetchUserLabels(user['first_name'], user['last_name']);
           
-          List<Map<String, String>> userLabels = [{"label_name":"gardening"}];
+          //List<Map<String, String>> userLabels = [{"label_name":"gardening"}];
           
           UserPreferences().saveUserData(
             userId: user['user_id'],

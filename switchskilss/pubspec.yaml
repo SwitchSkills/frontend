@@ -35,9 +35,7 @@ dependencies:
   flutterfire_cli: ^0.2.7
   firebase_core: ^2.15.1
 
-  assets:
-    - assets/images/profile_pic.jpg
-
+ 
 
 
 
