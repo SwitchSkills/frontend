@@ -5,21 +5,44 @@ import '../../components/job_post.dart';
 import '../../components/liked_jobs_counter.dart';
 
 
-class LikesScreen extends StatelessWidget {
+class LikesScreen extends StatefulWidget {
   const LikesScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Background(
-      child: SafeArea(
-        child: Responsive(
-          desktop: DesktopLikesScreen(),
-          mobile: const MobileLikesScreen(),
+  _LikesScreenState createState() => _LikesScreenState();
+
+  class _LikesScreenState extends State<LikesScreen>{
+
+    List<dynamic> feedData = [];
+
+    @override
+    void initState() {
+      super.initState();
+      fetchFeed();
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return Background(
+        child: SafeArea(
+          child: Responsive(
+            desktop: DesktopLikesScreen(),
+            mobile: const MobileLikesScreen(),
+          ),
         ),
-      ),
-    );
+      );
+    }
+
+    Future<void> fetchFeed({
+
+    }
+
+    )
   }
 }
+
+  
+
 
 class DesktopLikesScreen extends StatelessWidget {
   @override
@@ -33,9 +56,13 @@ class DesktopLikesScreen extends StatelessWidget {
 }
 
 class MobileLikesScreen extends StatelessWidget {
+
+  final List<dynamic> feedData;
+
   const MobileLikesScreen({
     Key? key,
-  }) : super(key: key);
+    required this.feedData,
+    }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -77,30 +104,31 @@ class MobileLikesScreen extends StatelessWidget {
         
         SizedBox(height: 10),
         Expanded(
-          child: ListView.builder(
-            itemCount: JobCounter,
-            itemBuilder: (context, index) {
-              List<String> tags = [];
-              if (index % 3 == 0) tags = ['Skill 1'];
-              if (index % 3 == 1) tags = ['Skill 1', 'Skill 2'];
-              if (index % 3 == 2) tags = ['Skill 1', 'Skill 2', 'Skill 3'];
+          child: feedData.isEmpty 
+            ? Center(child: Text("No posts available to display.")) 
+            : ListView.builder(
+                itemCount: feedData.length,
+                itemBuilder: (context, index) {
+                  final job = feedData[feedData.length - 1 - index];
+                  return JobPost(
+                    title: job['title'] ?? '',
+                    profileImageUrl: job['email_address'] ?? '',
+                    description: job['job_description'] ?? '',
+                    postImageUrl: 'nogleeg', 
+                    jobLocation: job['job_location'] ?? '',
+                    region_name: job['region_name'] ?? '',
+                    country: job['country'] ?? '',
+                    tags: List<String>.from(job['labels'].map((label) => label['label_name'] ?? '')),
+                    firstNameOwner: job['first_name'] ?? '',
+                    lastNameOwner: job['last_name'] ?? '',
+                    phoneNumber: job['phone_number'] ?? '',
+                    emailAddress: job['email_address'] ?? '',
+                    userLocation: job['user_location'] ?? '',
+                    starRating: 4.5,
+                  );
 
-              return JobPost(
-                profileImageUrl: 'assets/images/profile_pic.jpg',
-                title: 'Liked Job $index',
-                description: 'Job description for liked job $index...',
-                postImageUrl: 'assets/images/post_pic.png',
-                location: 'Hasselt',
-                tags: tags,
-                firstName: 'First Name $index',
-                lastName: 'Last Name $index',
-                phoneNumber: '+32 471 23 45 67',
-                emailAddress: 'mail@example.com',
-                userLocation: 'User $index Location',
-                starRating: 4.5,
-              );
-            },
-          ),
+                },
+              ),
         ),
       ],
     );

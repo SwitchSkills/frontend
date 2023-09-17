@@ -9,6 +9,7 @@ import '../../../user_preferences.dart';
 import '../Screens/AddPost/add_post_screen.dart';
 
 
+
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({Key? key}) : super(key: key);
 
@@ -18,6 +19,8 @@ class BottomNavBar extends StatefulWidget {
 
 class BottomNavBarState extends State<BottomNavBar> {
   int _selectedIndex = 0;
+  final bottomNavBarKey = GlobalKey<BottomNavBarState>();
+
 
   
   final List<Widget> _pages = [
@@ -87,6 +90,13 @@ class BottomNavBarState extends State<BottomNavBar> {
       _selectedIndex = 1;
     });
   }
+
+  void navigateToProfileScreen() {
+      setState(() {
+        _selectedIndex = 3; 
+      });
+  }
+
 }
 
 final List<SalomonBottomBarItem> _navBarItems = [

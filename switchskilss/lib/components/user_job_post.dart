@@ -105,17 +105,17 @@ TableRow _createRow(String label, String value) {
 
 
   @override
-Widget build(BuildContext context) {
-  print(postImageUrl);
-  return Card(
-    elevation: 5.0,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10.0),
-      side: BorderSide(
-        color: Colors.black,
-        width: 0.5, 
-        ),
-    ),
+  Widget build(BuildContext context) {
+    print(postImageUrl);
+    return Card(
+      elevation: 5.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        side: BorderSide(
+          color: Colors.black,
+          width: 0.5, 
+          ),
+      ),
 
     child: Padding(
       padding: const EdgeInsets.all(8.0),

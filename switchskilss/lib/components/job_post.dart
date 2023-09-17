@@ -3,36 +3,56 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share/share.dart';
 import '../Screens/Likes/likes_screen.dart';
 import 'bottom_nav_bar.dart';
+import '../../../user_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class JobPost extends StatelessWidget {
   final String profileImageUrl;
   final String title;
   final String description;
   final String postImageUrl;
-  final String location; 
+  final String jobLocation;
+  final String region_name;
+  final String country; 
   final List<String> tags;
-  final String firstName; 
-  final String lastName;
+  final String firstNameOwner; 
+  final String lastNameOwner;
   final String phoneNumber; 
   final String emailAddress; 
   final String userLocation; 
   final double starRating;
 
-  const JobPost({
+  JobPost({
     Key? key,
     required this.profileImageUrl,
     required this.title,
     required this.description,
     required this.postImageUrl,
-    required this.location, 
+    required this.jobLocation, 
+    required this.region_name,
+    required this.country,
     required this.tags,
-    required this.firstName, 
-    required this.lastName, 
+    required this.firstNameOwner, 
+    required this.lastNameOwner, 
     required this.phoneNumber, 
     required this.emailAddress, 
     required this.userLocation,
     required this.starRating, 
   }) : super(key: key);
+
+  String firstNameLiker = "";
+  String lastNameLiker = "";
+
+
+  Future<void> _fetchUserData() async {
+    final Map<String, String> userData = await UserPreferences().getUserData();
+
+    firstNameLiker = userData['first_name'] ?? "";
+    lastNameLiker = userData['last_name'] ?? "";
+  }
+  
+
 
 void showProfileDialog(BuildContext context) {
   showDialog(
@@ -65,8 +85,8 @@ void showProfileDialog(BuildContext context) {
                 1: IntrinsicColumnWidth(),
                 },
                 children: [
-                _createRow('First Name:', firstName),
-                _createRow('Last Name:', lastName),
+                _createRow('First Name:', firstNameOwner),
+                _createRow('Last Name:', lastNameOwner),
                 _createRow('Phone Number:', phoneNumber),
                 _createRow('Email Address:', emailAddress),
                 _createRow('Location:', userLocation),
@@ -101,9 +121,6 @@ TableRow _createRow(String label, String value) {
   );
 }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -137,7 +154,7 @@ TableRow _createRow(String label, String value) {
                 ),
                 InkWell(
                   onTap: () async {
-                    final url = 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(location)}';
+                    final url = 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(jobLocation)}';
                     if (await canLaunch(url)) {
                       await launch(url);
                     } else {
@@ -151,7 +168,7 @@ TableRow _createRow(String label, String value) {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
-                      location,
+                      jobLocation,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -206,28 +223,75 @@ TableRow _createRow(String label, String value) {
                 ),
                 IconButton(
                   icon: Icon(Icons.favorite_border),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Post has been added to your liked post.'),
-                        action: SnackBarAction(
-                          label: 'Go to Likes',
-                          onPressed: () {
-                            if (Navigator.canPop(context)) {
-                              Navigator.pop(context);
-                            }
-                            BottomNavBarState? bottomNavBarState = context.findAncestorStateOfType<BottomNavBarState>(); 
-                            if (bottomNavBarState != null) {
-                              bottomNavBarState.navigateToLikesScreen();
-                            }
-                          },
-                        ),
-                      ),
+                  onPressed: () async {
+                    final requestData = {
+                      'first_name': firstNameLiker,
+                      'last_name': lastNameLiker,
+                      'title': title,
+                      'job_region': {
+                        'country': country, 
+                        'region_name': region_name,
+                      },
+                      'first_name_owner': firstNameOwner,
+                      'last_name_owner': lastNameOwner
+                    };
+
+                    final response = await http.post(
+                      Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/user_liked_job'),
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: json.encode(requestData),
                     );
+
+                    
+                    if (response.statusCode == 200) {
+                      final responseBody = json.decode(response.body);
+                      if (responseBody['code'] == 200) {
+                       
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Post has been added to your liked post.'),
+                            action: SnackBarAction(
+                              label: 'Go to Likes',
+                              onPressed: () {
+                                if (Navigator.canPop(context)) {
+                                  Navigator.pop(context);
+                                }
+                                BottomNavBarState? bottomNavBarState = context.findAncestorStateOfType<BottomNavBarState>();
+                                if (bottomNavBarState != null) {
+                                  bottomNavBarState.navigateToLikesScreen();
+                                }
+                              },
+                            ),
+                          ),
+                        );
+                      } else if (responseBody['code'] == 400) {
+                        
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Client error: ${responseBody['message']}'),
+                          ),
+                        );
+                      } else {
+                        
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Unexpected response from the server.'),
+                          ),
+                        );
+                      }
+                    } else {
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to connect to the server.'),
+                        ),
+                      );
+                    }
                   },
                   color: Colors.pink,
                 ),
-
               ],
             ),
           ],

@@ -5,6 +5,8 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../../user_preferences.dart';
+import '../Profile/profile_screen.dart';
+import '../../components/bottom_nav_bar.dart';
 
 
 class EditProfileScreen extends StatelessWidget {
@@ -101,6 +103,8 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
   List<String> allRegions = [];
   bool isPasswordObscured = true;
   final String backendUrl = 'https://ethereal-yen-394407.ew.r.appspot.com/';
+  final GlobalKey<BottomNavBarState> bottomNavBarKey = GlobalKey<BottomNavBarState>();
+
 
   @override
   void initState() {
@@ -325,6 +329,14 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('User info updated successfully!')),
                   );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BottomNavBar(key: bottomNavBarKey),
+                    ),
+                  );
+                  bottomNavBarKey.currentState?.navigateToProfileScreen();
+
                   print(statusCode);
                 }
               } catch (e) {
@@ -336,19 +348,18 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
             },
             child: Text('Save'),
           ),
+
         ],
       ),
     );
   }
 
 
-Future<int> updateUserInfo() async {
-  ;
-  final Map<String, String> userData = await UserPreferences().getUserData();
-  print("####################");
-  print("This is the userData");
-  print(userData);
 
+Future<int> updateUserInfo() async {
+
+  final Map<String, String> userData = await UserPreferences().getUserData();
+  
   String firstNameValue = firstNameController.text.isNotEmpty ? firstNameController.text : userData['first_name'] ?? "";
   String lastNameValue = lastNameController.text.isNotEmpty ? lastNameController.text : userData['last_name'] ?? "";
   String locationValue = locationController.text.isNotEmpty ? locationController.text : userData['location'] ?? "";
@@ -451,7 +462,6 @@ Future<List<String>> fetchAllRegions() async {
     Map<String, dynamic> jsonResponse = json.decode(response.body);
     if (jsonResponse['code'] == 200) {
       List<dynamic> labelsData = jsonResponse['message'];
-      // extract here all the regions from the list of dictionaries
       return labelsData.map((data) => data['region_name'] as String).toList();
     } else {
       throw Exception('Unexpected response from the backend: ${jsonResponse['message']}');

@@ -91,12 +91,13 @@ class _FeedScreenState extends State<FeedScreen> {
       dynamic requestBody; requestBody;
 
       if (isActivityFeed) {
-        url = 'https://ethereal-yen-394407.ew.r.appspot.com/activity_feed';
-        requestBody = activityFeedArgs!;
+          url = 'https://ethereal-yen-394407.ew.r.appspot.com/activity_feed';
+          requestBody = activityFeedArgs ?? [];
       } else {
-        url = 'https://ethereal-yen-394407.ew.r.appspot.com/match_jobs';
-        requestBody = matchJobsArgs!;
+          url = 'https://ethereal-yen-394407.ew.r.appspot.com/match_jobs';
+          requestBody = matchJobsArgs ?? {};
       }
+
 
       final response = await http.post(
         Uri.parse(url),
@@ -199,10 +200,12 @@ class MobileFeedScreen extends StatelessWidget {
                     profileImageUrl: job['email_address'] ?? '',
                     description: job['job_description'] ?? '',
                     postImageUrl: 'nogleeg', 
-                    location: job['job_location'] ?? '',
+                    jobLocation: job['job_location'] ?? '',
+                    region_name: job['region_name'] ?? '',
+                    country: job['country'] ?? '',
                     tags: List<String>.from(job['labels'].map((label) => label['label_name'] ?? '')),
-                    firstName: job['first_name'] ?? '',
-                    lastName: job['last_name'] ?? '',
+                    firstNameOwner: job['first_name'] ?? '',
+                    lastNameOwner: job['last_name'] ?? '',
                     phoneNumber: job['phone_number'] ?? '',
                     emailAddress: job['email_address'] ?? '',
                     userLocation: job['user_location'] ?? '',
