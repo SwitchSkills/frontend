@@ -7,7 +7,7 @@ import '../../../user_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class JobPost extends StatelessWidget {
+class JobPost extends StatefulWidget {
   final String profileImageUrl;
   final String title;
   final String description;
@@ -41,16 +41,68 @@ class JobPost extends StatelessWidget {
     required this.starRating, 
   }) : super(key: key);
 
+  @override
+  _JobPostState createState() => _JobPostState();
+}
+
+class _JobPostState extends State<JobPost> {
+
   String firstNameLiker = "";
   String lastNameLiker = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
 
 
   Future<void> _fetchUserData() async {
     final Map<String, String> userData = await UserPreferences().getUserData();
 
-    firstNameLiker = userData['first_name'] ?? "";
-    lastNameLiker = userData['last_name'] ?? "";
+    setState(() {
+      firstNameLiker = userData['first_name'] ?? "";
+      lastNameLiker = userData['last_name'] ?? "";
+    });
   }
+
+_showContactOptions(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Container(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.phone, color: Colors.blue),
+              title: Text('Call'),
+              onTap: () => _launchURL(context, 'tel:${widget.phoneNumber}'),
+            ),
+            ListTile(
+              leading: Icon(Icons.email, color: Colors.green),
+              title: Text('Email'),
+              onTap: () => _launchURL(context, 'tel:${widget.emailAddress}'),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+_launchURL(BuildContext context, String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Could not launch $url'),
+      ),
+    );
+  }
+}
   
 
 
@@ -85,12 +137,11 @@ void showProfileDialog(BuildContext context) {
                 1: IntrinsicColumnWidth(),
                 },
                 children: [
-                _createRow('First Name:', firstNameOwner),
-                _createRow('Last Name:', lastNameOwner),
-                _createRow('Phone Number:', phoneNumber),
-                _createRow('Email Address:', emailAddress),
-                _createRow('Location:', userLocation),
-                _createRow('Rating:', starRating.toString()),
+                _createRow('First Name:', widget.firstNameOwner),
+                _createRow('Last Name:', widget.lastNameOwner),
+                _createRow('Phone Number:', widget.phoneNumber),
+                _createRow('Email Address:', widget.emailAddress),
+                _createRow('Location:', widget.userLocation),
                 ],
             ),
             ),
@@ -138,13 +189,13 @@ TableRow _createRow(String label, String value) {
                 GestureDetector(
                     onTap: () => showProfileDialog(context),
                     child: CircleAvatar(
-                      backgroundImage: AssetImage(profileImageUrl),
+                      backgroundImage: AssetImage(widget.profileImageUrl),
                     ),
                 ),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    title,
+                    widget.title,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -154,7 +205,7 @@ TableRow _createRow(String label, String value) {
                 ),
                 InkWell(
                   onTap: () async {
-                    final url = 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(jobLocation)}';
+                    final url = 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(widget.jobLocation)}';
                     if (await canLaunch(url)) {
                       await launch(url);
                     } else {
@@ -168,7 +219,7 @@ TableRow _createRow(String label, String value) {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
-                      jobLocation,
+                      widget.jobLocation,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -180,17 +231,17 @@ TableRow _createRow(String label, String value) {
             ),
             SizedBox(height: 10),
             Text(
-              description,
+              widget.description,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: 10),
-            Image.asset(postImageUrl),
+            Image.asset(widget.postImageUrl),
             SizedBox(height: 10),
             Center( 
                 child: Wrap(
                     spacing: 8,
-                    children: tags.map((tag) => Container(
+                    children: widget.tags.map((tag) => Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                         color: Colors.grey,
@@ -227,14 +278,15 @@ TableRow _createRow(String label, String value) {
                     final requestData = {
                       'first_name': firstNameLiker,
                       'last_name': lastNameLiker,
-                      'title': title,
+                      'title': widget.title,
                       'job_region': {
-                        'country': country, 
-                        'region_name': region_name,
+                        'country': widget.country, 
+                        'region_name': widget.region_name,
                       },
-                      'first_name_owner': firstNameOwner,
-                      'last_name_owner': lastNameOwner
+                      'first_name_owner': widget.firstNameOwner,
+                      'last_name_owner': widget.lastNameOwner
                     };
+                    print(requestData);
 
                     final response = await http.post(
                       Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/user_liked_job'),
@@ -302,42 +354,6 @@ TableRow _createRow(String label, String value) {
 }
 
 
-_showContactOptions(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    builder: (context) {
-      return Container(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.phone, color: Colors.blue),
-              title: Text('Call'),
-              onTap: () => _launchURL(context, 'tel:+32471785072'),
-            ),
-            ListTile(
-              leading: Icon(Icons.email, color: Colors.green),
-              title: Text('Email'),
-              onTap: () => _launchURL(context, 'mailto:dag.malstaf@gmail.com'),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
 
-_launchURL(BuildContext context, String url) async {
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Could not launch $url'),
-      ),
-    );
-  }
-}
 
 

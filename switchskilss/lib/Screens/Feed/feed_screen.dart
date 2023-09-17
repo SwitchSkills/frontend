@@ -16,19 +16,43 @@ class FeedScreen extends StatefulWidget {
 
 class _FeedScreenState extends State<FeedScreen> {
   bool isActivityFeed = true; 
+  bool hasFetchedFeed = false;
   List<dynamic> feedData = []; 
 
   @override
   void initState() {
     super.initState();
-    fetchFeed();
+    _initializeFeed();
   }
+
+  void _initializeFeed() async {
+  Map<String, dynamic> userDetails = await getUserDetails();
+  if (isActivityFeed) {
+    fetchFeed(activityFeedArgs: userDetails['regions']);
+  } else {
+    fetchFeed(matchJobsArgs: {
+      'first_name': userDetails['first_name'],
+      'last_name': userDetails['last_name'],
+    });
+  }
+}
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    fetchFeed();
+    if (!hasFetchedFeed) {
+      _initializeFeed();
+      hasFetchedFeed = true;
+    }
   }
+
+  @override
+  void didUpdateWidget(covariant FeedScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _initializeFeed();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,58 +101,56 @@ class _FeedScreenState extends State<FeedScreen> {
     };
   }
 
-
-
-
-
-
-
   Future<void> fetchFeed({
-  List<Map<String, dynamic>>? activityFeedArgs, 
-  Map<String, String>? matchJobsArgs,
-    }) async {
-      String url;
-      dynamic requestBody; requestBody;
+    List<Map<String, dynamic>>? activityFeedArgs, 
+    Map<String, String>? matchJobsArgs,
+      }) async {
+        String url;
+        dynamic requestBody; requestBody;
 
-      if (isActivityFeed) {
+        if (isActivityFeed) {
+          if (activityFeedArgs == null || activityFeedArgs.isEmpty) {
+            print('No regions provided. Not making the API call.');
+            return; 
+          }
           url = 'https://ethereal-yen-394407.ew.r.appspot.com/activity_feed';
-          requestBody = activityFeedArgs ?? [];
-      } else {
+          requestBody = activityFeedArgs;
+        } else {
           url = 'https://ethereal-yen-394407.ew.r.appspot.com/match_jobs';
           requestBody = matchJobsArgs ?? {};
-      }
+        }
 
 
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: json.encode(requestBody),
-      );
+        final response = await http.post(
+          Uri.parse(url),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: json.encode(requestBody),
+        );
 
-      if (response.statusCode == 200) {
-        var responseData = json.decode(response.body);
-        print(responseData);
+        if (response.statusCode == 200) {
+          var responseData = json.decode(response.body);
+          print(responseData);
 
-        if (responseData.containsKey('code') && responseData['code'] == 200 && responseData.containsKey('message')) {
-          var jobsList = responseData['message'];
+          if (responseData.containsKey('code') && responseData['code'] == 200 && responseData.containsKey('message')) {
+            var jobsList = responseData['message'];
 
-          if (jobsList is List) {
-            setState(() {
-              feedData = jobsList;
-            });
+            if (jobsList is List) {
+              setState(() {
+                feedData = jobsList;
+              });
+            } else {
+              print('Unexpected data format for "message": $jobsList');
+            }
           } else {
-            print('Unexpected data format for "message": $jobsList');
+            print('Unexpected response data: $responseData');
           }
         } else {
-          print('Unexpected response data: $responseData');
+          print('Error fetching feed: ${response.body}');
         }
-      } else {
-        print('Error fetching feed: ${response.body}');
-      }
 
-    }
+      }
 
 }
 class DesktopFeedScreen extends StatelessWidget {
