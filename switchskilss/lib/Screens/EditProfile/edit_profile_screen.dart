@@ -379,10 +379,13 @@ Future<int> updateUserInfo() async {
     'location': locationValue,
     'email_address': emailAddressValue,
     'phone_number': phoneNumberValue,
-    'password': passwordValue,
     'labels': skillsValue.map((skill) => {'label_name': skill}).toList(),
     'regions': regionsValue.map((region) => {'region_name': region, 'country': 'Belgium'}).toList(),
   };
+
+  if (passwordValue.isNotEmpty) {
+    userMap['password'] = passwordValue;
+  }
 
   await UserPreferences().saveUserData(
     userId: userData['user_id'] ?? 'Default User Id',
@@ -400,14 +403,6 @@ Future<int> updateUserInfo() async {
     labels: jsonEncode(userMap['labels'])
   );
 
-  print("####################");
-  print("This is the userMap");
-  print(userMap);
-
-  final Map<String, String> userDataUpdated = await UserPreferences().getUserData();
-  print("####################");
-  print("This is the userDataUpdated");
-  print(userDataUpdated);
 
   final response = await http.post(
     Uri.parse(fullUrl('user')),

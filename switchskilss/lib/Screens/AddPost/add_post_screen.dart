@@ -344,7 +344,7 @@ Future<int> addPost() async {
   Map<String, dynamic> jobMap = {
     'title': titleController.text,
     'description': descriptionController.text,
-    'picture': {
+    'pictures': {
       'picture_location_firebase': _uploadedImageUrl, 
       'description': 'Uploaded image for post',  
     },
@@ -357,12 +357,6 @@ Future<int> addPost() async {
     'first_name_owner': firstNameOwner,
     'last_name_owner':lastNameOwner,
   };
-
-  print("###########");
-  print("This is the job i upload to the backend");
-  print(jobMap);
-
-  
 
   final response = await http.post(
     Uri.parse(fullUrl('job')),

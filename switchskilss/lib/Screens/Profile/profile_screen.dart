@@ -65,15 +65,10 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
     List<dynamic> fetchedRegions = json.decode(userData['regions'] ?? '[]');
     regions = fetchedRegions.map((region) => region['region_name'] as String).toList();
     List<dynamic> fetchedLabels = json.decode(userData['labels'] ?? '[]');
-    print(fetchedLabels);
     skills = fetchedLabels.map((label) => label['label_name'] as String).toList();
-
-
-
     email = userData['email_address'] ?? "";
     telephone = userData['phone_number'] ?? "";
     location = userData['location'] ?? "";
-
 
     final response = await http.post(
       Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/jobs_owned_by_user'),
@@ -155,8 +150,6 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
 
           ...userJobs.map((job) {
             print(job['picture_location_firebase']);
-            
-            
 
             return UserJobPost(
               profileImageUrl: profilePictureUrl, 
