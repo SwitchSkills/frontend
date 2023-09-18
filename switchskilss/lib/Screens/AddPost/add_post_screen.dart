@@ -74,14 +74,14 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
 
   @override
   void initState() {
-  super.initState();
+    super.initState();
 
-  _loadSkills();
-  _loadRegions();
+    _loadSkills();
+    _loadRegions();
 
-  titleController = TextEditingController();
-  descriptionController = TextEditingController();
-  locationController = TextEditingController();
+    titleController = TextEditingController();
+    descriptionController = TextEditingController();
+    locationController = TextEditingController();
   }
 
   void _loadSkills() async {

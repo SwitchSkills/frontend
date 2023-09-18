@@ -136,9 +136,11 @@ class _FeedScreenState extends State<FeedScreen> {
             
 
             if (jobsList is List) {
-              setState(() {
-                feedData = jobsList;
-              });
+              if (mounted) { 
+                    setState(() {
+                        feedData = jobsList;
+                    });
+                }
             } else {
               print('Unexpected data format for "message": $jobsList');
             }

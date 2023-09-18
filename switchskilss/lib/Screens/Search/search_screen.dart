@@ -7,9 +7,8 @@ import '../../../user_preferences.dart';
 
 enum SearchType {
   description,
-  name,
+  owner,
   skill,
-  skillDescription,
   title,
 }
 
@@ -42,12 +41,102 @@ class MobileSearchScreen extends StatefulWidget {
 }
 
 class _MobileSearchScreenState extends State<MobileSearchScreen> {
-  final TextEditingController searchController = TextEditingController();
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
+  late TextEditingController searchController;
+  late TextEditingController firstNameController;
+  late TextEditingController lastNameController;
+
+  List<String> selectedRegions = [];
+  String? selectedSkill;
+
+  List<String> allSkills = [];
+  List<String> allRegions = [];
+
+  final TextEditingController skillsController = TextEditingController();
+  final TextEditingController regionsController = TextEditingController();
+  
 
   final String backendUrl = 'https://ethereal-yen-394407.ew.r.appspot.com/';
   SearchType? selectedSearchType;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _loadSkills();
+    _loadRegions();
+
+    searchController = TextEditingController();
+    firstNameController = TextEditingController();
+    lastNameController = TextEditingController();
+
+
+  }
+
+  String fullUrl(String route) {
+    return backendUrl + route;
+  }
+
+  void _loadSkills() async {
+    try {
+      List<String> skills = await fetchAllSkills();
+      setState(() {
+        allSkills = skills;
+      });
+    } catch (e) {
+      print("Error fetching skills: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching skills: $e')),
+      );
+    }
+  }
+
+  void _loadRegions() async {
+    try {
+      List<String> regions = await fetchAllRegions();
+      setState(() {
+        allRegions = regions;
+      });
+    } catch (e) {
+      print("Error fetching regions: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching regions: $e')),
+      );
+    }
+  }
+
+  Future<List<String>> fetchAllSkills() async {
+  final Uri uri = Uri.parse(fullUrl('all_labels'));
+  final response = await http.get(uri);
+
+  if (response.statusCode == 200) {
+    Map<String, dynamic> jsonResponse = json.decode(response.body);
+    if (jsonResponse['code'] == 200) {
+      List<dynamic> labelsData = jsonResponse['message'];
+      return labelsData.map((data) => data['label_name'] as String).toList();
+    } else {
+      throw Exception('Unexpected response from the backend: ${jsonResponse['message']}');
+    }
+  } else {
+    throw Exception('Failed to load skills from the backend');
+  }
+}
+
+Future<List<String>> fetchAllRegions() async {
+  final Uri uri = Uri.parse(fullUrl('all_regions'));
+  final response = await http.get(uri);
+
+  if (response.statusCode == 200) {
+    Map<String, dynamic> jsonResponse = json.decode(response.body);
+    if (jsonResponse['code'] == 200) {
+      List<dynamic> labelsData = jsonResponse['message'];
+      return labelsData.map((data) => data['region_name'] as String).toList();
+    } else {
+      throw Exception('Unexpected response from the backend: ${jsonResponse['message']}');
+    }
+  } else {
+    throw Exception('Failed to load regions from the backend');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +144,33 @@ class _MobileSearchScreenState extends State<MobileSearchScreen> {
       padding: const EdgeInsets.all(12.0),
       child: Column(
         children: [
+
+          Container(
+            padding: EdgeInsets.all(8),  
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                "Search Jobs",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.orange,  
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 20),
+
           DropdownButton<SearchType>(
             hint: Text('Select search type'),
             value: selectedSearchType,
@@ -94,7 +210,7 @@ class _MobileSearchScreenState extends State<MobileSearchScreen> {
             ),
           ),
         ];
-      case SearchType.name:
+      case SearchType.owner:
         return [
           TextField(
             controller: firstNameController,
@@ -113,7 +229,46 @@ class _MobileSearchScreenState extends State<MobileSearchScreen> {
           ),
         ];
       case SearchType.skill:
-      case SearchType.skillDescription:
+      return [
+        TypeAheadFormField<String>(
+            textFieldConfiguration: TextFieldConfiguration(
+              controller: skillsController,
+              decoration: InputDecoration(
+                labelText: 'Search for a skill',
+                labelStyle: TextStyle(color: Colors.black),
+                border: OutlineInputBorder(),
+              ),
+            ),
+            suggestionsCallback: (pattern) {
+              return allSkills.where((skill) => skill.toLowerCase().contains(pattern.toLowerCase())).toList();
+            },
+            itemBuilder: (context, String suggestion) {
+              return ListTile(
+                title: Text(suggestion),
+              );
+            },
+            onSuggestionSelected: (String suggestion) {
+              setState(() {
+                selectedSkill = suggestion; 
+                skillsController.clear();
+              });
+            },
+          ),
+
+          
+          if (selectedSkill != null)
+            Chip(
+              label: Text(selectedSkill!),
+              onDeleted: () {
+                setState(() {
+                  selectedSkill = null;  
+                });
+              },
+              deleteIcon: Icon(Icons.close),
+            ),
+          SizedBox(height: 12),
+
+      ];
       case SearchType.title:
         return [
           TextField(
@@ -130,38 +285,33 @@ class _MobileSearchScreenState extends State<MobileSearchScreen> {
   }
 
   void _performSearch() async {
-  Map<String, dynamic> payload = {};
+    Map<String, dynamic> payload = {};
 
-  switch (selectedSearchType) {
-    case SearchType.description:
-      payload['search'] = 'description';
-      payload['description'] = searchController.text;
-      break;
+    switch (selectedSearchType) {
+      case SearchType.description:
+        payload['search'] = 'description';
+        payload['description'] = searchController.text;
+        break;
 
-    case SearchType.name:
-      payload['first_name'] = firstNameController.text;
-      payload['last_name'] = lastNameController.text;
-      break;
+      case SearchType.owner:
+        payload['first_name'] = firstNameController.text;
+        payload['last_name'] = lastNameController.text;
+        break;
 
-    case SearchType.skill:
-      payload['search'] = 'skill';
-      payload['skill'] = searchController.text;
-      break;
+      case SearchType.skill:
+        payload['search'] = 'skill';
+        payload['skill'] = searchController.text;
+        break;
 
-    case SearchType.skillDescription:
-      payload['search'] = 'skill description';
-      payload['skill description'] = searchController.text;
-      break;
+      case SearchType.title:
+        payload['search'] = 'title';
+        payload['title'] = searchController.text;
+        break;
 
-    case SearchType.title:
-      payload['search'] = 'title';
-      payload['title'] = searchController.text;
-      break;
-
-    default:
-      _showFeedback('Invalid search type');
-      return;
-  }
+      default:
+        _showFeedback('Invalid search type');
+        return;
+    }
 
   try {
     final response = await http.post(
@@ -186,6 +336,8 @@ class _MobileSearchScreenState extends State<MobileSearchScreen> {
     _showFeedback('Error performing search: $error');
   }
 }
+
+
 
 void _showFeedback(String message) {
   ScaffoldMessenger.of(context).showSnackBar(
