@@ -57,7 +57,8 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
   List<String> selectedSkills = [];
   List<String> selectedRegions = [];
   List<String> allSkills = [];
-  List<String> allRegions = [];
+  String selectedRegion;
+
 
   final TextEditingController skillsController = TextEditingController();
   final TextEditingController regionsController = TextEditingController();
@@ -198,7 +199,7 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
             textFieldConfiguration: TextFieldConfiguration(
               controller: regionsController,
               decoration: InputDecoration(
-                labelText: 'Regions',
+                labelText: 'Region',
                 labelStyle: TextStyle(color: Colors.black),
                 border: OutlineInputBorder(),
               ),
@@ -213,29 +214,23 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
             },
             onSuggestionSelected: (String suggestion) {
               setState(() {
-                if (!selectedRegions.contains(suggestion)) {
-                  selectedRegions.add(suggestion);
-                }
+                selectedRegion = suggestion; 
                 regionsController.clear();
               });
             },
           ),
 
           
-          Wrap(
-            spacing: 8,
-            children: selectedRegions.map((skill) {
-              return Chip(
-                label: Text(skill),
-                onDeleted: () {
-                  setState(() {
-                    selectedRegions.remove(skill);
-                  });
-                },
-                deleteIcon: Icon(Icons.close),
-              );
-            }).toList(),
-          ),
+          if (selectedRegion != null)
+            Chip(
+              label: Text(selectedRegion),
+              onDeleted: () {
+                setState(() {
+                  selectedRegion = null;  
+                });
+              },
+              deleteIcon: Icon(Icons.close),
+            ),
           SizedBox(height: 12),
 
         

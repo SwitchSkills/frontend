@@ -49,6 +49,7 @@ class _JobPostState extends State<JobPost> {
 
   String firstNameLiker = "";
   String lastNameLiker = "";
+  bool isLiked = false;
 
   @override
   void initState() {
@@ -273,9 +274,12 @@ TableRow _createRow(String label, String value) {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.favorite_border),
+                  icon: Icon(isLiked ? Icons.favorite : Icons.favorite_border),
                   onPressed: () async {
-                    final requestData = {
+                    if (isLiked) {
+                      // TODO: Call an API to unlike the post
+                    } else {
+                      final requestData = {
                       'first_name': firstNameLiker,
                       'last_name': lastNameLiker,
                       'title': widget.title,
@@ -286,7 +290,6 @@ TableRow _createRow(String label, String value) {
                       'first_name_owner': widget.firstNameOwner,
                       'last_name_owner': widget.lastNameOwner
                     };
-                    print(requestData);
 
                     final response = await http.post(
                       Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/user_liked_job'),
@@ -300,6 +303,9 @@ TableRow _createRow(String label, String value) {
                     if (response.statusCode == 200) {
                       final responseBody = json.decode(response.body);
                       if (responseBody['code'] == 200) {
+                        setState(() {
+                          isLiked = true;
+                        });
                        
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
