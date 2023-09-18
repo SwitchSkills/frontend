@@ -9,6 +9,16 @@ class UserPreferences {
 
   UserPreferences._internal();
 
+  Future<void> setLikedJobs(List<String> likedJobs) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('likedJobs', likedJobs);
+  }
+
+  Future<List<String>> getLikedJobs() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList('likedJobs') ?? [];
+  }
+
   Future<void> saveUserData({
     required String userId,
     required String firstName,

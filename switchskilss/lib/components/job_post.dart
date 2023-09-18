@@ -55,6 +55,7 @@ class _JobPostState extends State<JobPost> {
   void initState() {
     super.initState();
     _fetchUserData();
+    _fetchLikedState();
   }
 
 
@@ -67,31 +68,38 @@ class _JobPostState extends State<JobPost> {
     });
   }
 
-_showContactOptions(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    builder: (context) {
-      return Container(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.phone, color: Colors.blue),
-              title: Text('Call'),
-              onTap: () => _launchURL(context, 'tel:${widget.phoneNumber}'),
-            ),
-            ListTile(
-              leading: Icon(Icons.email, color: Colors.green),
-              title: Text('Email'),
-              onTap: () => _launchURL(context, 'mailto:${widget.emailAddress}'),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
+  Future<void> _fetchLikedState() async {
+  List<String> likedJobs = await UserPreferences().getLikedJobs();
+  setState(() {
+    isLiked = likedJobs.contains(widget.title);
+    });
+  }
+
+  _showContactOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.phone, color: Colors.blue),
+                title: Text('Call'),
+                onTap: () => _launchURL(context, 'tel:${widget.phoneNumber}'),
+              ),
+              ListTile(
+                leading: Icon(Icons.email, color: Colors.green),
+                title: Text('Email'),
+                onTap: () => _launchURL(context, 'mailto:${widget.emailAddress}'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
 _launchURL(BuildContext context, String url) async {
   if (await canLaunch(url)) {
@@ -307,6 +315,10 @@ TableRow _createRow(String label, String value) {
                           setState(() {
                             isLiked = false;
                           });
+
+                          final likedJobs = await UserPreferences().getLikedJobs();
+                          likedJobs.remove(widget.title);
+                          await UserPreferences().setLikedJobs(likedJobs);
                         
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -351,6 +363,10 @@ TableRow _createRow(String label, String value) {
                           setState(() {
                             isLiked = true;
                           });
+
+                          final likedJobs = await UserPreferences().getLikedJobs();
+                          likedJobs.add(widget.title);
+                          await UserPreferences().setLikedJobs(likedJobs);
                         
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
