@@ -55,9 +55,10 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
   late TextEditingController locationController;
   
   List<String> selectedSkills = [];
-  List<String> selectedRegions = [];
+  String? selectedRegion;
   List<String> allSkills = [];
-  String selectedRegion;
+  List<String> allRegions = [];
+  
 
 
   final TextEditingController skillsController = TextEditingController();
@@ -223,7 +224,7 @@ class _MobileAddPostScreenState extends State<MobileAddPostScreen> {
           
           if (selectedRegion != null)
             Chip(
-              label: Text(selectedRegion),
+              label: Text(selectedRegion!),
               onDeleted: () {
                 setState(() {
                   selectedRegion = null;  
@@ -290,7 +291,7 @@ Future<void> _uploadImage(File image) async {
     String title = titleController.text; 
     String firstName = firstNameForm;
     String lastName = lastNameForm;
-    String region = selectedRegions.first;
+    String region = selectedRegion!;
 
     String fileName = 'job_picture_${title}_${firstName}_${lastName}_${randomNumber}.${fileExtension}';
 
@@ -339,14 +340,14 @@ Future<int> addPost() async {
   Map<String, dynamic> jobMap = {
     'title': titleController.text,
     'description': descriptionController.text,
-    'pictures': {
+    'pictures': [{
       'picture_location_firebase': _uploadedImageUrl, 
       'description': 'Uploaded image for post',  
-    },
+    }],
     'location': locationController.text,
     'labels': selectedSkills.map((skill) => {'label_name': skill}).toList(),
     'region': {
-      'region_name': selectedRegions.first, 
+      'region_name': selectedRegion!, 
       'country': 'Belgium'
     },
     'first_name_owner': firstNameOwner,

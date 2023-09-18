@@ -102,7 +102,6 @@ class _LoginFormState extends State<LoginForm> {
           var user = responseData['message'][0];
           List<Map<String, String>> userLabels = await fetchUserLabels(user['first_name'], user['last_name']);
           
-          //List<Map<String, String>> userLabels = [{"label_name":"gardening"}];
           
           UserPreferences().saveUserData(
             userId: user['user_id'],
@@ -111,7 +110,6 @@ class _LoginFormState extends State<LoginForm> {
             emailAddress: user['email_address'],
             phoneNumber: user['phone_number'],
             location: user['location'],
-            password: user['password'],
             alternativeCommunication: user['alternative_communication'] ?? "",
             bibliography: user['bibliography'] ?? "",
             pictureLocationFirebase: user['picture_location_firebase'] ?? "",
@@ -121,7 +119,6 @@ class _LoginFormState extends State<LoginForm> {
         );
         void printUserData() async {
           final Map<String, String> userData = await UserPreferences().getUserData();
-          //print('User Data: $userData');
         }
         printUserData();
         ScaffoldMessenger.of(context).showSnackBar(

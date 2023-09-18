@@ -303,7 +303,6 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
                     alternativeCommunication: userDetails['alternative_communication'] ?? '',
                     bibliography: userDetails['bibliography'] ?? '',
                     location: userDetails['location'],
-                    password: userDetails['password'],
                     pictureLocationFirebase: userDetails['picture_location_firebase'] ?? '',
                     pictureDescription: userDetails['picture_description'] ?? '',
                     regions: jsonEncode(userDetails['regions']),

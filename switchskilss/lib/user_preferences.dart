@@ -16,7 +16,6 @@ class UserPreferences {
     required String emailAddress,
     required String phoneNumber,
     required String location,
-    required String password,
     required String alternativeCommunication,
     required String bibliography,
     required String pictureLocationFirebase,
@@ -32,7 +31,6 @@ class UserPreferences {
     prefs.setString('email_address', emailAddress);
     prefs.setString('phone_number', phoneNumber);
     prefs.setString('location', location);
-    prefs.setString('password', password);
     prefs.setString('alternative_communication', alternativeCommunication);
     prefs.setString('bibliography', bibliography);
     prefs.setString('picture_location_firebase', pictureLocationFirebase);
@@ -51,7 +49,6 @@ class UserPreferences {
       'email_address': prefs.getString('email_address') ?? 'Default Email Address',
       'phone_number': prefs.getString('phone_number') ?? 'Default Phone Number',
       'location': prefs.getString('location') ?? 'Default Location',
-      'password': prefs.getString('password') ?? 'Default Password',
       'alternative_communication': prefs.getString('alternative_communication') ?? 'Default Alternative Communication',
       'bibliography': prefs.getString('bibliography') ?? 'Default Bibliography',
       'picture_location_firebase': prefs.getString('picture_location_firebase') ?? 'Default Picture Location Firebase',
@@ -70,7 +67,6 @@ class UserPreferences {
     prefs.remove('email_address');
     prefs.remove('phone_number');
     prefs.remove('location');
-    prefs.remove('password');
     prefs.remove('alternative_communication');
     prefs.remove('bibliography');
     prefs.remove('picture_location_firebase');

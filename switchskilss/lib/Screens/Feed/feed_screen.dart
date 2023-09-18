@@ -131,10 +131,9 @@ class _FeedScreenState extends State<FeedScreen> {
 
         if (response.statusCode == 200) {
           var responseData = json.decode(response.body);
-          print(responseData);
-
           if (responseData.containsKey('code') && responseData['code'] == 200 && responseData.containsKey('message')) {
             var jobsList = responseData['message'];
+            
 
             if (jobsList is List) {
               setState(() {
@@ -221,7 +220,7 @@ class MobileFeedScreen extends StatelessWidget {
                     title: job['title'] ?? '',
                     profileImageUrl: job['email_address'] ?? '',
                     description: job['job_description'] ?? '',
-                    postImageUrl: 'nogleeg', 
+                    postImageUrl: job['pictures'][0]['picture_location_firebase'] ?? "",  
                     jobLocation: job['job_location'] ?? '',
                     region_name: job['region_name'] ?? '',
                     country: job['country'] ?? '',

@@ -237,7 +237,9 @@ TableRow _createRow(String label, String value) {
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: 10),
-            Image.asset(widget.postImageUrl),
+            Image.network(widget.postImageUrl
+            
+            ),
             SizedBox(height: 10),
             Center( 
                 child: Wrap(
@@ -276,10 +278,7 @@ TableRow _createRow(String label, String value) {
                 IconButton(
                   icon: Icon(isLiked ? Icons.favorite : Icons.favorite_border),
                   onPressed: () async {
-                    if (isLiked) {
-                      // TODO: Call an API to unlike the post
-                    } else {
-                      final requestData = {
+                    final requestData = {
                       'first_name': firstNameLiker,
                       'last_name': lastNameLiker,
                       'title': widget.title,
@@ -290,62 +289,94 @@ TableRow _createRow(String label, String value) {
                       'first_name_owner': widget.firstNameOwner,
                       'last_name_owner': widget.lastNameOwner
                     };
+                    if (isLiked) {
+                      final response = await http.post(
+                        Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/user_unliked_job'),
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: json.encode(requestData),
+                      );
 
-                    final response = await http.post(
-                      Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/user_liked_job'),
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: json.encode(requestData),
-                    );
-
-                    
-                    if (response.statusCode == 200) {
-                      final responseBody = json.decode(response.body);
-                      if (responseBody['code'] == 200) {
-                        setState(() {
-                          isLiked = true;
-                        });
-                       
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Post has been added to your liked post.'),
-                            action: SnackBarAction(
-                              label: 'Go to Likes',
-                              onPressed: () {
-                                if (Navigator.canPop(context)) {
-                                  Navigator.pop(context);
-                                }
-                                BottomNavBarState? bottomNavBarState = context.findAncestorStateOfType<BottomNavBarState>();
-                                if (bottomNavBarState != null) {
-                                  bottomNavBarState.navigateToLikesScreen();
-                                }
-                              },
-                            ),
-                          ),
-                        );
-                      } else if (responseBody['code'] == 400) {
+                      if (response.statusCode == 200) {
+                        final responseBody = json.decode(response.body);
+                        if (responseBody['code'] == 200) {
+                          setState(() {
+                            isLiked = false;
+                          });
                         
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Client error: ${responseBody['message']}'),
-                          ),
-                        );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Post has been deleted from your liked posts.'),
+                            ),
+                          );
+                        } else if (responseBody['code'] == 400) {
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Client error: ${responseBody['message']}'),
+                            ),
+                          );
+                        } else {
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Unexpected response from the server.'),
+                            ),
+                          );
+                        }
                       } else {
                         
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Unexpected response from the server.'),
+                            content: Text('Failed to connect to the server.'),
                           ),
                         );
                       }
                     } else {
-                      
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Failed to connect to the server.'),
-                        ),
+                      final response = await http.post(
+                        Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/user_liked_job'),
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: json.encode(requestData),
                       );
+
+                      if (response.statusCode == 200) {
+                        final responseBody = json.decode(response.body);
+                        if (responseBody['code'] == 200) {
+                          setState(() {
+                            isLiked = true;
+                          });
+                        
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Post has been added to your liked posts.'),
+                            ),
+                          );
+                        } else if (responseBody['code'] == 400) {
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Client error: ${responseBody['message']}'),
+                            ),
+                          );
+                        } else {
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Unexpected response from the server.'),
+                            ),
+                          );
+                        }
+                      } else {
+                        
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to connect to the server.'),
+                          ),
+                        );
+                      }
                     }
                   },
                   color: Colors.pink,

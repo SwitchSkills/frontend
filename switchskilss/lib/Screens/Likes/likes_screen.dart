@@ -143,7 +143,7 @@ class MobileLikesScreen extends StatelessWidget {
                     title: job['title'] ?? '',
                     profileImageUrl: job['email_address'] ?? '',
                     description: job['job_description'] ?? '',
-                    postImageUrl: 'nogleeg', 
+                    postImageUrl: job['pictures'][0]['picture_location_firebase'] ?? "", 
                     jobLocation: job['job_location'] ?? '',
                     region_name: job['region_name'] ?? '',
                     country: job['country'] ?? '',
@@ -155,7 +155,6 @@ class MobileLikesScreen extends StatelessWidget {
                     userLocation: job['user_location'] ?? '',
                     starRating: 4.5,
                   );
-
                 },
               ),
         ),

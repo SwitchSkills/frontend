@@ -93,7 +93,6 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
   late TextEditingController lastNameController;
   late TextEditingController emailController;
   late TextEditingController phoneNumberController;
-  late TextEditingController passwordController;
   late TextEditingController locationController;
   List<String> selectedSkills = [];
   List<String> selectedRegions = [];
@@ -101,7 +100,6 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
   late TextEditingController regionsController = TextEditingController();
   List<String> allSkills = [];
   List<String> allRegions = [];
-  bool isPasswordObscured = true;
   final String backendUrl = 'https://ethereal-yen-394407.ew.r.appspot.com/';
   final GlobalKey<BottomNavBarState> bottomNavBarKey = GlobalKey<BottomNavBarState>();
 
@@ -120,7 +118,6 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
   lastNameController = TextEditingController(text: widget.lastName);
   emailController = TextEditingController(text: widget.email);
   phoneNumberController = TextEditingController(text: widget.phoneNumber);
-  passwordController = TextEditingController();
   locationController = TextEditingController(text: widget.location);
   skillsController = TextEditingController();
   regionsController = TextEditingController();
@@ -210,27 +207,8 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
               border: OutlineInputBorder(),
             ),
           ),
-          SizedBox(height: 12),
           
-          TextField(
-            controller: passwordController,
-            decoration: InputDecoration(
-              labelText: 'Password',
-              labelStyle: TextStyle(color: Colors.black),
-              border: OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  isPasswordObscured ? Icons.visibility : Icons.visibility_off,
-                ),
-                onPressed: () {
-                  setState(() {
-                    isPasswordObscured = !isPasswordObscured;
-                  });
-                },
-              ),
-            ),
-            obscureText: isPasswordObscured,
-          ),
+          
           
           SizedBox(height: 12),
           TypeAheadFormField<String>(
@@ -365,7 +343,6 @@ Future<int> updateUserInfo() async {
   String locationValue = locationController.text.isNotEmpty ? locationController.text : userData['location'] ?? "";
   String emailAddressValue = emailController.text.isNotEmpty ? emailController.text : userData['email_address'] ?? "";
   String phoneNumberValue = phoneNumberController.text.isNotEmpty ? phoneNumberController.text : userData['phone_number'] ?? "";
-  String passwordValue = passwordController.text.isNotEmpty ? passwordController.text : userData['password'] ?? "";
 
   List<dynamic> fetchedRegions = json.decode(userData['regions'] ?? '[]');
   List<String> regionsValue = selectedRegions.isNotEmpty ? selectedRegions : fetchedRegions.map((region) => region['region_name'] as String).toList();
@@ -383,9 +360,7 @@ Future<int> updateUserInfo() async {
     'regions': regionsValue.map((region) => {'region_name': region, 'country': 'Belgium'}).toList(),
   };
 
-  if (passwordValue.isNotEmpty) {
-    userMap['password'] = passwordValue;
-  }
+  print(userMap);
 
   await UserPreferences().saveUserData(
     userId: userData['user_id'] ?? 'Default User Id',
@@ -394,7 +369,6 @@ Future<int> updateUserInfo() async {
     emailAddress: emailAddressValue,
     phoneNumber: phoneNumberValue,
     location: locationValue,
-    password: passwordValue,
     alternativeCommunication: userData['alternative_communication'] ?? 'Default Alternative Communication',
     bibliography: userData['bibliography'] ?? 'Default Bibliography',
     pictureLocationFirebase: userData['picture_location_firebase'] ?? 'Default Picture Location Firebase',

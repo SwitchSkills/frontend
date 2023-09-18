@@ -149,13 +149,13 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
           SizedBox(height: 20),
 
           ...userJobs.map((job) {
-            print(job['picture_location_firebase']);
+            print(job['pictures'][0]['picture_location_firebase']);
 
             return UserJobPost(
               profileImageUrl: profilePictureUrl, 
               title: job['title'] ?? "",
               description: job['job_description'] ?? "",
-              postImageUrl: job['picture_location_firebase'] ?? "", 
+              postImageUrl: job['pictures'][0]['picture_location_firebase'] ?? "", 
               location: job['job_location'] ?? "",
               labels: (job['labels'] as List).map((e) => e['label_name'].toString()).toList(),
               firstName: job['first_name'],
