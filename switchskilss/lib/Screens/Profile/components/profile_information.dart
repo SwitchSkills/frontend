@@ -24,7 +24,6 @@ class ProfileInformation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(profilePictureUrl);
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Container(

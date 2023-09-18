@@ -106,7 +106,6 @@ TableRow _createRow(String label, String value) {
 
   @override
   Widget build(BuildContext context) {
-    print(postImageUrl);
     return Card(
       elevation: 5.0,
       shape: RoundedRectangleBorder(

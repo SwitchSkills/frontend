@@ -110,7 +110,7 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
           SizedBox(height: 10),
 
           ProfileInformation(
-            profilePictureUrl: profilePictureUrl,
+            profilePictureUrl: 'assets/images/profile_pic.jpg',
             firstName: firstName,
             lastName: lastName,
             skills: skills,
