@@ -164,7 +164,8 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
               phoneNumber: job['phone_number'],
               emailAddress: job['email_address'],
               userLocation: job['user_location'],
-              starRating: 4.5, 
+              starRating: 4.5,
+              onJobDeleted: _fetchUserDataAndJobs,
             );
           }).toList(),
           

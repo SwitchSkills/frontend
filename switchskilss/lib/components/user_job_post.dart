@@ -21,6 +21,7 @@ class UserJobPost extends StatelessWidget {
   final String emailAddress; 
   final String userLocation; 
   final double starRating;
+  final Function onJobDeleted;
 
   const UserJobPost({
     Key? key,
@@ -37,7 +38,8 @@ class UserJobPost extends StatelessWidget {
     required this.phoneNumber, 
     required this.emailAddress, 
     required this.userLocation,
-    required this.starRating, 
+    required this.starRating,
+    required this.onJobDeleted, 
   }) : super(key: key);
 
 void showProfileDialog(BuildContext context) {
@@ -291,6 +293,7 @@ Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
                           content: Text('Job post has been deleted successfully.'),
                         ),
                       );
+                      onJobDeleted();
                     } else if (responseBody['code'] == 400) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
