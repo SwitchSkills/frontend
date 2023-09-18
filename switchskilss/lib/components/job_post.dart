@@ -237,7 +237,10 @@ TableRow _createRow(String label, String value) {
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: 10),
-            Image.network(widget.postImageUrl
+            Image.network(widget.postImageUrl,
+            errorBuilder: (context, error, stackTrace) {
+                    return Image.asset('assets/images/image-not-found.jpg');
+                  },
             
             ),
             SizedBox(height: 10),

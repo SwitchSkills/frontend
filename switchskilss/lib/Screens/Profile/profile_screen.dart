@@ -42,7 +42,7 @@ class MobileProfileScreen extends StatefulWidget {
 
 
 class _MobileProfileScreenState extends State<MobileProfileScreen> {
-  final String profilePictureUrl = 'switchskilss/assets/images/profile_pic.jpg';
+  final String profilePictureUrl = 'assets/images/profile_pic.jpg';
   String firstName = "";
   String lastName = "";
   List<String> skills = [];
@@ -149,10 +149,9 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
           SizedBox(height: 20),
 
           ...userJobs.map((job) {
-            print(job['pictures'][0]['picture_location_firebase']);
 
             return UserJobPost(
-              profileImageUrl: profilePictureUrl, 
+              profileImageUrl: 'assets/images/profile_pic.jpg' ?? '',
               title: job['title'] ?? "",
               description: job['job_description'] ?? "",
               postImageUrl: job['pictures'][0]['picture_location_firebase'] ?? "", 
