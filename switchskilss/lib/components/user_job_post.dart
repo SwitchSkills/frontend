@@ -3,13 +3,17 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share/share.dart';
 import '../Screens/Likes/likes_screen.dart';
 import 'bottom_nav_bar.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class UserJobPost extends StatelessWidget {
   final String profileImageUrl;
   final String title;
   final String description;
   final String postImageUrl;
-  final String location; 
+  final String jobLocation;
+  final String region_name;
+  final String country;  
   final List<String> labels;
   final String firstName; 
   final String lastName;
@@ -24,7 +28,9 @@ class UserJobPost extends StatelessWidget {
     required this.title,
     required this.description,
     required this.postImageUrl,
-    required this.location, 
+    required this.jobLocation, 
+    required this.region_name,
+    required this.country, 
     required this.labels,
     required this.firstName, 
     required this.lastName, 
@@ -80,6 +86,7 @@ void showProfileDialog(BuildContext context) {
 }
 
 
+
 TableRow _createRow(String label, String value) {
   return TableRow(
     children: [
@@ -100,6 +107,33 @@ TableRow _createRow(String label, String value) {
     ],
   );
 }
+
+Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
+  return await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Confirm Delete'),
+        content: Text('Are you sure you want to delete this job post?'),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop(false); 
+            },
+          ),
+          TextButton(
+            child: Text('Delete', style: TextStyle(color: Colors.red)),
+            onPressed: () {
+              Navigator.of(context).pop(true);  
+            },
+          ),
+        ],
+      );
+    }
+  ) ?? false; 
+}
+
 
 
 
@@ -136,7 +170,7 @@ TableRow _createRow(String label, String value) {
               ),
               InkWell(
                 onTap: () async {
-                  final url = 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(location)}';
+                  final url = 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(jobLocation)}';
                     if (await canLaunch(url)) {
                       await launch(url);
                     } else {
@@ -150,7 +184,7 @@ TableRow _createRow(String label, String value) {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Text(
-                    location,
+                    jobLocation,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -228,14 +262,63 @@ TableRow _createRow(String label, String value) {
                 ),
               ),
               ElevatedButton(
-                    onPressed: () {},
-                    child: Icon(Icons.delete, size: 16, color: Colors.white),
-                    style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        minimumSize: Size(32, 32),
-                    ),
-                  ),
-              
+                onPressed: () async {
+                  bool shouldDelete = await _showDeleteConfirmationDialog(context);
+                  if (shouldDelete) {
+                    final requestData = {
+                      'first_name': firstName,
+                      'last_name': lastName,
+                      'title': title,
+                      'job_region': {
+                        'country': country, 
+                        'region_name': region_name, 
+                      },
+                    };
+
+                  final response = await http.post(
+                    Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/remove_job'),
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: json.encode(requestData),
+                  );
+
+                  if (response.statusCode == 200) {
+                    final responseBody = json.decode(response.body);
+                    if (responseBody['code'] == 200) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Job post has been deleted successfully.'),
+                        ),
+                      );
+                    } else if (responseBody['code'] == 400) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Client error: ${responseBody['message']}'),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Unexpected response from the server.'),
+                        ),
+                      );
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to connect to the server.'),
+                      ),
+                    );
+                  }
+                  }
+                },
+                child: Icon(Icons.delete, size: 16, color: Colors.white),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red,
+                  minimumSize: Size(32, 32),
+                ),
+              ),
             ],
           ),
         ],
