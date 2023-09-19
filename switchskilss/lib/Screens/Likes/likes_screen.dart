@@ -143,7 +143,7 @@ class MobileLikesScreen extends StatelessWidget {
                   final job = feedData[feedData.length - 1 - index];
                   return JobPost(
                     title: job['title'] ?? '',
-                    profileImageUrl: '/assets/images/profile_pic.jpg' ?? '',
+                    profileImageUrl: 'assets/images/profile_pic.jpg' ?? '',
                     description: job['job_description'] ?? '',
                     postImageUrl: job['pictures'][0]['picture_location_firebase'] ?? "", 
                     jobLocation: job['job_location'] ?? '',

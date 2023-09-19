@@ -189,6 +189,50 @@ Future<List<String>> fetchAllRegions() async {
           SizedBox(height: 12),
           ..._buildSearchFields(),
           SizedBox(height: 12),
+          TypeAheadFormField<String>(
+            textFieldConfiguration: TextFieldConfiguration(
+              controller: regionsController,
+              decoration: InputDecoration(
+                labelText: 'Regions',
+                labelStyle: TextStyle(color: Colors.black),
+                border: OutlineInputBorder(),
+              ),
+            ),
+            suggestionsCallback: (pattern) {
+              return allRegions.where((region) => region.toLowerCase().contains(pattern.toLowerCase())).toList();
+            },
+            itemBuilder: (context, String suggestion) {
+              return ListTile(
+                title: Text(suggestion),
+              );
+            },
+            onSuggestionSelected: (String suggestion) {
+              setState(() {
+                if (!selectedRegions.contains(suggestion)) {
+                  selectedRegions.add(suggestion);
+                }
+                regionsController.clear();
+              });
+            },
+          ),
+
+          
+          Wrap(
+            spacing: 8,
+            children: selectedRegions.map((skill) {
+              return Chip(
+                label: Text(skill),
+                onDeleted: () {
+                  setState(() {
+                    selectedRegions.remove(skill);
+                  });
+                },
+                deleteIcon: Icon(Icons.close),
+              );
+            }).toList(),
+          ),
+          SizedBox(height: 12),
+
           ElevatedButton(
             onPressed: _performSearch,
             child: Text('Search'),
@@ -286,26 +330,41 @@ Future<List<String>> fetchAllRegions() async {
 
   void _performSearch() async {
     Map<String, dynamic> payload = {};
+    List<Map<String, dynamic>> regionPayload = [];
+
+    for (String region in selectedRegions) {
+      regionPayload.add({
+        'country': 'Belgium',
+        'region_name': region
+      });
+    }
+
+    payload['region'] = regionPayload;
 
     switch (selectedSearchType) {
       case SearchType.description:
-        payload['search'] = 'description';
-        payload['description'] = searchController.text;
+        payload['type'] = 'description';
+        payload['search'] = searchController.text;
         break;
 
       case SearchType.owner:
-        payload['first_name'] = firstNameController.text;
-        payload['last_name'] = lastNameController.text;
+        payload['type'] = 'owner';
+        if (firstNameController.text.isNotEmpty) {
+          payload['first_name'] = firstNameController.text;
+        }
+        if (lastNameController.text.isNotEmpty) {
+          payload['last_name'] = lastNameController.text;
+        }
         break;
 
       case SearchType.skill:
-        payload['search'] = 'skill';
-        payload['skill'] = searchController.text;
+        payload['type'] = 'skills';
+        payload['search'] = selectedSkill; 
         break;
 
       case SearchType.title:
-        payload['search'] = 'title';
-        payload['title'] = searchController.text;
+        payload['type'] = 'title';
+        payload['search'] = searchController.text;
         break;
 
       default:
@@ -313,21 +372,27 @@ Future<List<String>> fetchAllRegions() async {
         return;
     }
 
+
   try {
     final response = await http.post(
-      Uri.parse(backendUrl + 'search_job'),
+      Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/search_job'),
       headers: {
         'Content-Type': 'application/json',
       },
       body: json.encode(payload),
     );
 
+    List<Map<String, dynamic>> jsonResponse = json.decode(response.body);
+
+    print(jsonResponse);
+    print(response.body);
+
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data.isEmpty) {
         _showFeedback('No results found.');
       } else {
-        // Handle your data here, for example, update the UI or navigate to another screen
+        print(response.body);
       }
     } else {
       _showFeedback('Failed to search: ${response.body}');
