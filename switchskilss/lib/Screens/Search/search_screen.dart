@@ -371,35 +371,48 @@ Future<List<String>> fetchAllRegions() async {
         _showFeedback('Invalid search type');
         return;
     }
-
+  print(payload);
 
   try {
     final response = await http.post(
-      Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/search_job'),
+      Uri.parse('https://ethereal-yen-394407.ew.r.appspot.com/search_jobs'),
       headers: {
         'Content-Type': 'application/json',
       },
       body: json.encode(payload),
     );
 
-    List<Map<String, dynamic>> jsonResponse = json.decode(response.body);
-
+    final Map<String, dynamic> jsonResponse = json.decode(response.body);
     print(jsonResponse);
-    print(response.body);
+    
+    int statusCode = jsonResponse['code'];
+    String message = jsonResponse['message'];
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data.isEmpty) {
-        _showFeedback('No results found.');
+    print(message);
+    print(statusCode);
+    
+   
+
+    if (statusCode == 200) {
+      if (response.headers['content-type']?.contains('application/json') ?? false) {
+        
+        if (message is List) {
+          print(message);
+        } else {
+          _showFeedback('Unexpected JSON structure.');
+        }
       } else {
-        print(response.body);
+        _showFeedback('Expected JSON response, but got something else.');
       }
     } else {
       _showFeedback('Failed to search: ${response.body}');
     }
   } catch (error) {
+    print(error);
     _showFeedback('Error performing search: $error');
   }
+
+
 }
 
 
