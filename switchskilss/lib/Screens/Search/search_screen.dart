@@ -4,6 +4,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../../user_preferences.dart';
+import '../../components/job_post.dart';
 
 enum SearchType {
   description,
@@ -57,6 +58,8 @@ class _MobileSearchScreenState extends State<MobileSearchScreen> {
 
   final String backendUrl = 'https://ethereal-yen-394407.ew.r.appspot.com/';
   SearchType? selectedSearchType;
+
+  List<dynamic> feedData = [];
 
   @override
   void initState() {
@@ -237,6 +240,36 @@ Future<List<String>> fetchAllRegions() async {
             onPressed: _performSearch,
             child: Text('Search'),
           ),
+
+          SizedBox(height: 20),
+
+          Expanded(
+          child: feedData.isEmpty 
+            ? Center(child: Text("No posts available to display.")) 
+            : ListView.builder(
+                itemCount: feedData.length,
+                itemBuilder: (context, index) {
+                  final job = feedData[feedData.length - 1 - index];
+                  return JobPost(
+                    title: job['title'] ?? '',
+                    profileImageUrl: 'assets/images/profile_pic.jpg' ?? '',
+                    description: job['job_description'] ?? '',
+                    postImageUrl: job['pictures'][0]['picture_location_firebase'] ?? "",  
+                    jobLocation: job['job_location'] ?? '',
+                    region_name: job['region_name'] ?? '',
+                    country: job['country'] ?? '',
+                    tags: List<String>.from(job['labels'].map((label) => label['label_name'] ?? '')),
+                    firstNameOwner: job['first_name'] ?? '',
+                    lastNameOwner: job['last_name'] ?? '',
+                    phoneNumber: job['phone_number'] ?? '',
+                    emailAddress: job['email_address'] ?? '',
+                    userLocation: job['user_location'] ?? '',
+                    starRating: 4.5,
+                  );
+
+                },
+              ),
+          ),
         ],
       ),
     );
@@ -383,27 +416,25 @@ Future<List<String>> fetchAllRegions() async {
     );
 
     final Map<String, dynamic> jsonResponse = json.decode(response.body);
-    print(jsonResponse);
     
     int statusCode = jsonResponse['code'];
-    String message = jsonResponse['message'];
-
-    print(message);
     print(statusCode);
+    print(jsonResponse['message']);
     
-   
-
     if (statusCode == 200) {
-      if (response.headers['content-type']?.contains('application/json') ?? false) {
-        
-        if (message is List) {
+        if (jsonResponse['message'] is List) {
+          List<dynamic> message = jsonResponse['message'];
+
           print(message);
+          if (mounted) { 
+                    setState(() {
+                        feedData = message;
+                    });
+                }
         } else {
           _showFeedback('Unexpected JSON structure.');
         }
-      } else {
-        _showFeedback('Expected JSON response, but got something else.');
-      }
+      
     } else {
       _showFeedback('Failed to search: ${response.body}');
     }
