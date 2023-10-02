@@ -22,11 +22,31 @@ class _LoginFormState extends State<LoginForm> {
   String lastName = ''; 
   String password = '';
 
+  late FocusNode _firstNameFocus;
+  late FocusNode _lastNameFocus;
+  late FocusNode _passwordFocus;
+
   bool isPasswordObscured = true;
 
 
   String fullUrl(String route) {
     return backendUrl + route;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _firstNameFocus = FocusNode();
+    _lastNameFocus = FocusNode();
+    _passwordFocus = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _firstNameFocus.dispose();
+    _lastNameFocus.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
   }
 
  Future<List<Map<String, String>>> fetchUserLabels(String firstName, String lastName) async {
@@ -140,12 +160,21 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+    child: SingleChildScrollView(
+    child: Form(
       key: _formKey,
       child: Column(
         children: [
           TextFormField(
-            keyboardType: TextInputType.emailAddress,
+            focusNode: _firstNameFocus,
+            onFieldSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_lastNameFocus);
+            },
+            keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
             cursorColor: Colors.white,
             onSaved: (firstname) {
@@ -167,9 +196,13 @@ class _LoginFormState extends State<LoginForm> {
           ),
           SizedBox(height: 12),
           TextFormField(
-            keyboardType: TextInputType.emailAddress,
+            keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
             cursorColor: Colors.white,
+            focusNode: _lastNameFocus,
+              onFieldSubmitted: (_) {
+                FocusScope.of(context).requestFocus(_passwordFocus);
+              },
             onSaved: (lastname) {
               lastName = lastname ?? '';
             },
@@ -178,6 +211,7 @@ class _LoginFormState extends State<LoginForm> {
               hintStyle: TextStyle(
                 color: Colors.white,
               ),
+              
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(defaultPadding),
                 child: Icon(
@@ -193,6 +227,11 @@ class _LoginFormState extends State<LoginForm> {
               textInputAction: TextInputAction.done,
               obscureText: isPasswordObscured,
               cursorColor: Colors.white,
+              focusNode: _passwordFocus,
+                  onFieldSubmitted: (_) {
+                    _passwordFocus.unfocus();
+                  },
+              
               onSaved: (value) {
                 password = value ?? '';
               },
@@ -248,6 +287,8 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ],
       ),
+    ),
+    ),
     );
   }
 }

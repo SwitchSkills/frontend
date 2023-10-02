@@ -11,6 +11,7 @@ import '../../../user_preferences.dart';
 class FullSingupScreen extends StatelessWidget {
   final String email;
   final String password;
+  
 
   const FullSingupScreen({
     Key? key,
@@ -76,6 +77,19 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
   bool isPasswordObscured = true;
   final String backendUrl = 'https://ethereal-yen-394407.ew.r.appspot.com/';
 
+  late FocusNode _firstNameFocus;
+  late FocusNode _lastNameFocus;
+  late FocusNode _locationFocus;
+  late FocusNode _emailFocus;
+  late FocusNode _phoneNumberFocus;
+  late FocusNode _passwordFocus;
+  late FocusNode _skillsFocus;
+  late FocusNode _regionsFocus;
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  
+
   @override
   void initState() {
   super.initState();
@@ -89,6 +103,14 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
   locationController = TextEditingController();
   emailController = TextEditingController(text: widget.email);
   passwordController = TextEditingController(text: widget.password);
+  _firstNameFocus = FocusNode();
+  _lastNameFocus = FocusNode();
+  _locationFocus = FocusNode();
+  _emailFocus = FocusNode();
+  _phoneNumberFocus = FocusNode();
+  _passwordFocus = FocusNode();
+  _skillsFocus = FocusNode();
+  _regionsFocus = FocusNode();
   }
 
   void _loadSkills() async {
@@ -126,13 +148,19 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
 
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
+Widget build(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.all(12.0),
+    child: Form(
+      key: _formKey,
       child: Column(
         children: [
-          TextField(
+          TextFormField(
             controller: firstNameController,
+            focusNode: _firstNameFocus,
+            onFieldSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_lastNameFocus);
+            },
             decoration: InputDecoration(
               labelText: 'First Name',
               labelStyle: TextStyle(color: Colors.black),
@@ -140,8 +168,12 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
             ),
           ),
           SizedBox(height: 12),
-          TextField(
+          TextFormField(
             controller: lastNameController,
+            focusNode: _lastNameFocus,
+            onFieldSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_locationFocus);
+            },
             decoration: InputDecoration(
               labelText: 'Last Name',
               labelStyle: TextStyle(color: Colors.black),
@@ -149,8 +181,12 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
             ),
           ),
           SizedBox(height: 12),
-          TextField(
+          TextFormField(
             controller: locationController,
+            focusNode: _locationFocus,
+            onFieldSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_emailFocus);
+            },
             decoration: InputDecoration(
               labelText: 'Your Location',
               labelStyle: TextStyle(color: Colors.black),
@@ -158,8 +194,12 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
             ),
           ),
           SizedBox(height: 12),
-          TextField(
+          TextFormField(
             controller: emailController,
+            focusNode: _emailFocus,
+            onFieldSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_phoneNumberFocus);
+            },
             decoration: InputDecoration(
               labelText: 'Email',
               labelStyle: TextStyle(color: Colors.black),
@@ -167,8 +207,12 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
             ),
           ),
           SizedBox(height: 12),
-          TextField(
+          TextFormField(
             controller: phoneNumberController,
+            focusNode: _phoneNumberFocus,
+            onFieldSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_passwordFocus);
+            },
             decoration: InputDecoration(
               labelText: 'Phone Number',
               labelStyle: TextStyle(color: Colors.black),
@@ -176,9 +220,12 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
             ),
           ),
           SizedBox(height: 12),
-          
-          TextField(
+          TextFormField(
             controller: passwordController,
+            focusNode: _passwordFocus,
+            onFieldSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_skillsFocus);
+            },
             decoration: InputDecoration(
               labelText: 'Password',
               labelStyle: TextStyle(color: Colors.black),
@@ -201,6 +248,10 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
           TypeAheadFormField<String>(
             textFieldConfiguration: TextFieldConfiguration(
               controller: skillsController,
+              focusNode: _skillsFocus,
+              onEditingComplete: () {
+                FocusScope.of(context).requestFocus(_regionsFocus);
+              },
               decoration: InputDecoration(
                 labelText: 'Skills',
                 labelStyle: TextStyle(color: Colors.black),
@@ -245,6 +296,10 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
           TypeAheadFormField<String>(
             textFieldConfiguration: TextFieldConfiguration(
               controller: regionsController,
+              focusNode: _regionsFocus,
+              onEditingComplete: () {
+                _regionsFocus.unfocus();
+              },
               decoration: InputDecoration(
                 labelText: 'Regions',
                 labelStyle: TextStyle(color: Colors.black),
@@ -333,6 +388,7 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
 
         ],
       ),
+    ),
     );
   }
 
@@ -448,6 +504,14 @@ Future<List<String>> fetchAllRegions() async {
     regionsController.dispose();
     passwordController.dispose();
     skillsController.dispose();
+    _firstNameFocus.dispose();
+    _lastNameFocus.dispose();
+    _locationFocus.dispose();
+    _emailFocus.dispose();
+    _phoneNumberFocus.dispose();
+    _passwordFocus.dispose();
+    _skillsFocus.dispose();
+    _regionsFocus.dispose();
     super.dispose();
   }
 }

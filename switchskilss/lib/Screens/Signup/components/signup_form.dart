@@ -17,13 +17,39 @@ class _SignUpFormState extends State<SignUpForm> {
   String email = '';
   String password = '';
 
+  late FocusNode _emailFocus;
+  late FocusNode _passwordFocus;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailFocus = FocusNode();
+    _passwordFocus = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Form(
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ), 
+      child: SingleChildScrollView(
+      child: Form(
       key: _formKey,
       child: Column(
         children: [
           TextFormField(
+            focusNode: _emailFocus,
+            onFieldSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_passwordFocus);
+            },
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             cursorColor: Colors.white,
@@ -49,6 +75,10 @@ class _SignUpFormState extends State<SignUpForm> {
               textInputAction: TextInputAction.done,
               obscureText: true,
               cursorColor: Colors.white,
+              focusNode: _passwordFocus,
+                  onFieldSubmitted: (_) {
+                    _passwordFocus.unfocus();
+                  },
               onSaved: (value) => password = value ?? '',
               decoration: InputDecoration(
                 hintText: "Your password",
@@ -100,6 +130,8 @@ class _SignUpFormState extends State<SignUpForm> {
             },
           ),
         ],
+      ),
+    ),
       ),
     );
   }
