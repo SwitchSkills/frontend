@@ -151,6 +151,7 @@ class _MobileFullSignupScreenState extends State<MobileFullSignupScreen> {
 Widget build(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(12.0),
+    child: SingleChildScrollView(
     child: Form(
       key: _formKey,
       child: Column(
@@ -388,6 +389,7 @@ Widget build(BuildContext context) {
 
         ],
       ),
+    ),
     ),
     );
   }
